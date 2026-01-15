@@ -1,24 +1,39 @@
 ---
 layout: default
+title: "Foreign Trade Insights & Updates"
 ---
 
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <title>Foreign Trade Insights & Updates</title>
-</head>
-<body>
-  <h1>Foreign Trade Insights & Updates</h1>
-  <h3>Latest News</h3>
+<input type="text" id="searchInput" placeholder="Search articles..." style="width:100%; max-width:400px; padding:8px 12px; margin:20px 0; border-radius:5px; border:1px solid #ccc;">
 
-  <ul>
-    {% for post in site.posts %}
-      <li>
-        <a href="{{ post.url }}">{{ post.title }}</a>
-        <small>({{ post.date | date: "%d %b %Y" }})</small>
-      </li>
-    {% endfor %}
-  </ul>
-</body>
-</html>
+<h2>Latest News</h2>
+
+<ul class="post-list">
+  {% for post in site.posts %}
+    <li>
+      <a href="{{ post.url }}">{{ post.title }}</a>
+      <small>
+        {{ post.date | date: "%d %b %Y" }} | {{ post.category | capitalize }}
+        {% if post.author %}
+          | <span title="Go to LinkedIn page of {{ post.author }}">
+              <a href="{{ post.author_link }}" target="_blank">{{ post.author }}</a>
+            </span>
+        {% endif %}
+      </small>
+      {% if post.excerpt %}
+        <p>{{ post.excerpt }}</p>
+      {% endif %}
+    </li>
+  {% endfor %}
+</ul>
+
+<script>
+const searchInput = document.getElementById('searchInput');
+searchInput.addEventListener('keyup', function(){
+  const filter = searchInput.value.toLowerCase();
+  const posts = document.querySelectorAll('.post-list li');
+  posts.forEach(post=>{
+    const text = post.innerText.toLowerCase();
+    post.style.display = text.includes(filter) ? '' : 'none';
+  });
+});
+</script>
