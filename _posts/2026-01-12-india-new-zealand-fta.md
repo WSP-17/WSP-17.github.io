@@ -1,11 +1,13 @@
 ---
 layout: post
 title: "India–New Zealand FTA – A New Delhi Dominance Show"
-date: 2025-12-22
+date: 2025-01-12
 category: geopolitics
 author: "Divyansh Sharma"
 author_link: "https://www.linkedin.com/in/divyansh-sharma-h17/"
 excerpt: "India and New Zealand completed negotiations on a landmark Free Trade Agreement, cementing a strategic partnership and including zero-duty access on most Indian goods."
+featured_image: "/assets/images/posts/india-nz-fta/ind-nz-fta.jpeg"
+featured_image_alt: "Indian PM Narendra Modi and his New Zealand counterpart Christopher Luxon"
 ---
 
 On 22 December 2025, India and New Zealand completed negotiations on a landmark Free Trade Agreement (FTA), cementing a new strategic partnership between the two countries. The negotiations were completed in record time, just under nine months (16 March 2025 to 22 December 2025). The deal was the third in a row for India, with the previous ones being the India-UK FTA in July and India-Oman Comprehensive Economic Partnership Agreement (CEPA) in December last year. 
