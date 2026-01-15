@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{{ page.title | default: site.title }}</title>
+
   <style>
     body {
       font-family: Georgia, serif;
@@ -40,47 +41,6 @@
     main {
       max-width: 900px;
       margin: 20px auto;
-    }
-
-    .post-list {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-    }
-
-    .post-list li {
-      background: #fff;
-      margin-bottom: 20px;
-      padding: 15px 20px;
-      border-left: 5px solid #0077cc;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-    }
-
-    .post-list li a {
-      font-weight: bold;
-      color: #0077cc;
-      text-decoration: none;
-      font-size: 1.15rem;
-    }
-
-    .post-list li a:hover {
-      text-decoration: underline;
-    }
-
-    .post-list li small {
-      display: block;
-      color: #555;
-      margin-top: 5px;
-      font-size: 0.85rem;
-    }
-
-    #searchInput {
-      width: 100%;
-      padding: 10px 12px;
-      margin: 10px 0 20px 0;
-      border-radius: 5px;
-      border: 1px solid #ccc;
-      font-size: 1rem;
     }
 
     h2 {
@@ -132,16 +92,19 @@
 <body>
 
 <header>
-  <div style="display: grid; grid-template-columns: auto 1fr auto; align-items: center; padding: 0 30px;">
+  <div style="display:grid; grid-template-columns:auto 1fr auto; align-items:center; padding:0 30px;">
+
     <!-- Left logo -->
     <a href="https://commerce.dauniv.ac.in/" target="_blank">
       <img src="{{ '/assets/images/logos/college-logo.png' | relative_url }}" alt="College Logo" style="height:120px;">
     </a>
 
-    <!-- Center content -->
+    <!-- Center -->
     <div style="text-align:center;">
       <h1 style="margin:0;">{{ site.title }}</h1>
-      <p style="margin:5px 0; font-size:0.9em; opacity:0.8;">{{ site.description }}</p>
+      <p style="margin:5px 0; font-size:0.9em; opacity:0.8;">
+        {{ site.description }}
+      </p>
       <nav>
         <a href="{{ '/' | relative_url }}">Home</a>
         <a href="{{ '/about/' | relative_url }}">About</a>
@@ -152,29 +115,22 @@
     <a href="https://www.linkedin.com/company/fortex-foreign-trade-club-soc/about/" target="_blank">
       <img src="{{ '/assets/images/logos/club-logo.png' | relative_url }}" alt="Club Logo" style="height:120px;">
     </a>
+
   </div>
 </header>
+
+<main>
+  {{ content }}
+</main>
 
 <button id="backToTop">↑ Top</button>
 
 <script>
-  // Back to top
   const btn = document.getElementById('backToTop');
   window.onscroll = () => {
     btn.style.display = (document.documentElement.scrollTop > 200) ? 'block' : 'none';
   };
-  btn.onclick = () => window.scrollTo({top:0, behavior:'smooth'});
-
-  // Search filter
-  const searchInput = document.getElementById('searchInput');
-  searchInput.addEventListener('keyup', function() {
-    const filter = searchInput.value.toLowerCase();
-    const posts = document.querySelectorAll('.post-list li');
-    posts.forEach(post => {
-      const text = post.innerText.toLowerCase();
-      post.style.display = text.includes(filter) ? '' : 'none';
-    });
-  });
+  btn.onclick = () => window.scrollTo({ top: 0, behavior: 'smooth' });
 </script>
 
 </body>
