@@ -6,11 +6,12 @@
   <title>{{ page.title | default: site.title }}</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
+      font-family: Georgia, serif;
       margin:0;
       padding:0 20px;
-      background:#f9f9f9;
+      background:#fdf9f0;
       color:#333;
+      line-height:1.6;
     }
 
     header {
@@ -18,6 +19,10 @@
       text-align:center;
       background:#222;
       color:white;
+    }
+
+    header a img {
+      display:block;
     }
 
     nav a {
@@ -40,36 +45,62 @@
     .post-list {
       list-style:none;
       padding:0;
+      margin:0;
     }
 
     .post-list li {
       background:#fff;
-      margin-bottom:10px;
-      padding:10px 15px;
+      margin-bottom:20px;
+      padding:15px 20px;
       border-left:5px solid #0077cc;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
     }
 
     .post-list li a {
       font-weight:bold;
       color:#0077cc;
       text-decoration:none;
+      font-size:1.15rem;
+    }
+
+    .post-list li a:hover {
+      text-decoration:underline;
     }
 
     .post-list li small {
       display:block;
       color:#555;
-      margin-top:3px;
+      margin-top:5px;
+      font-size:0.85rem;
     }
 
-    /* MOBILE FIX — KEEP LOGOS LEFT & RIGHT */
+    #searchInput {
+      width:100%;
+      padding:10px 12px;
+      margin:10px 0 20px 0;
+      border-radius:5px;
+      border:1px solid #ccc;
+      font-size:1rem;
+    }
+
+    h2 {
+      margin-top:40px;
+      margin-bottom:20px;
+      color:#222;
+      border-bottom:2px solid #0077cc;
+      display:inline-block;
+      padding-bottom:3px;
+    }
+
+    /* MOBILE FIX */
     @media (max-width: 768px) {
       header > div {
-        grid-template-columns: 70px 1fr 70px;
+        grid-template-columns: 60px 1fr 60px;
         padding: 0 12px;
       }
 
       header img {
-        height: 60px !important;
+        height: 50px !important;
       }
 
       header h1 {
@@ -78,7 +109,7 @@
 
       header p {
         font-size: 0.85rem;
-        opacity: 0.85;
+        opacity:0.8;
       }
     }
   </style>
@@ -86,24 +117,17 @@
 <body>
 
 <header>
-  <div style="
-    display:grid;
-    grid-template-columns: auto 1fr auto;
-    align-items:center;
-    padding: 0 30px;
-  ">
+  <div style="display:grid; grid-template-columns: auto 1fr auto; align-items:center; padding: 0 30px;">
 
     <!-- Left logo -->
-    <img src="{{ '/assets/images/logos/college-logo.png' | relative_url }}"
-         alt="College Logo"
-         style="height:120px;">
+    <a href="https://commerce.dauniv.ac.in/" target="_blank">
+      <img src="{{ '/assets/images/logos/college-logo.png' | relative_url }}" alt="College Logo" style="height:120px;">
+    </a>
 
     <!-- Center content -->
     <div style="text-align:center;">
       <h1 style="margin:0;">{{ site.title }}</h1>
-      <p style="margin:5px 0; font-size:0.9em; opacity:0.8;">
-        {{ site.description }}
-      </p>
+      <p style="margin:5px 0; font-size:0.9em; opacity:0.8;">{{ site.description }}</p>
       <nav>
         <a href="{{ '/' | relative_url }}">Home</a>
         <a href="{{ '/about/' | relative_url }}">About</a>
@@ -111,9 +135,9 @@
     </div>
 
     <!-- Right logo -->
-    <img src="{{ '/assets/images/logos/club-logo.png' | relative_url }}"
-         alt="Club Logo"
-         style="height:120px;">
+    <a href="https://www.linkedin.com/company/fortex-foreign-trade-club-soc/about/" target="_blank">
+      <img src="{{ '/assets/images/logos/club-logo.png' | relative_url }}" alt="Club Logo" style="height:120px;">
+    </a>
 
   </div>
 </header>
@@ -123,30 +147,13 @@
 </main>
 
 <!-- Back to top button -->
-<button id="backToTop" style="
-  position: fixed;
-  bottom: 30px;
-  right: 30px;
-  display: none;
-  background:#0077cc;
-  color:white;
-  border:none;
-  padding:10px 15px;
-  border-radius:5px;
-  cursor:pointer;
-  z-index:1000;
-">
-  ↑ Top
-</button>
+<button id="backToTop" style="position: fixed; bottom: 30px; right: 30px; display: none; background:#0077cc; color:white; border:none; padding:10px 15px; border-radius:5px; cursor:pointer; z-index:1000;">↑ Top</button>
 
 <script>
+  // Back to top
   const btn = document.getElementById('backToTop');
-  window.onscroll = () => {
-    btn.style.display =
-      (document.documentElement.scrollTop > 200) ? 'block' : 'none';
-  };
-  btn.onclick = () =>
-    window.scrollTo({top:0, behavior:'smooth'});
+  window.onscroll = () => { btn.style.display = (document.documentElement.scrollTop > 200) ? 'block' : 'none'; };
+  btn.onclick = () => window.scrollTo({top:0, behavior:'smooth'});
 </script>
 
 </body>
