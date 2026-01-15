@@ -199,18 +199,30 @@ title: "Foreign Trade Insights & Updates"
 }
 
 @media (max-width: 768px) {
+  body {
+    padding: 0 12px; /* reduce side padding for mobile */
+  }
+
+  main {
+    margin: 0 auto; /* ensure main content is centered */
+  }
+
   .card-link {
-    flex-direction:column;
+    flex-direction: column; /* stack thumbnail and content vertically */
   }
 
   .thumb {
-    width:100%;
-    height:180px;
+    width: 100%;
+    height: 180px; /* fixed height for mobile thumbnails */
   }
 
   .post-card {
-  margin-left: auto;
-  margin-right: auto;
+    margin-left: auto;
+    margin-right: auto; /* center each card */
+  }
+
+  .search-bar {
+    margin-bottom: 20px; /* optional, adjust spacing from content */
   }
 }
 </style>
