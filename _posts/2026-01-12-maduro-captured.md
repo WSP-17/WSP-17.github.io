@@ -9,6 +9,8 @@ authors:
   - name: "Divyansh Sharma"
     link: "https://www.linkedin.com/in/divyansh-sharma-h17/"
 excerpt: "U.S. Delta Force captures Venezuelan President Nicolás Maduro. Implications for oil markets, geopolitics, and regional security are significant."
+featured_image: "assets/images/posts/maduro-captured/maduro-captured.jpg"
+featured_image_alt: "Nicolás Maduro being escorted by US authorities"
 ---
 
 A massive geopolitical shift occurred on January 3, 2026. In an early morning operation named "Operation Absolute Resolve," U.S. Delta Force units conducted a raid in Caracas, successfully capturing President Nicolás Maduro and his wife, Cilia Flores. Both were flown to New York and are currently being held in a Brooklyn federal jail. 
