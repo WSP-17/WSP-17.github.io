@@ -3,8 +3,7 @@ layout: default
 title: "Foreign Trade Insights & Updates"
 ---
 
-<!-- SEARCH BAR -->
-<input type="text" id="searchInput" placeholder="Search articles..." style="width:100%; padding:8px 12px; margin:10px 0 20px 0; border-radius:5px; border:1px solid #ccc;">
+<input type="text" id="searchInput" placeholder="Search articles...">
 
 {% assign latest_posts = "" | split: "" %}
 {% assign other_posts = "" | split: "" %}
@@ -21,7 +20,6 @@ title: "Foreign Trade Insights & Updates"
   {% endif %}
 {% endfor %}
 
-<!-- LATEST NEWS SECTION -->
 {% if latest_posts.size > 0 %}
   <h2>Latest News</h2>
   <ul class="post-list">
@@ -31,12 +29,11 @@ title: "Foreign Trade Insights & Updates"
         <small>
           {{ post.date | date: "%d %b %Y" }} | {{ post.category | capitalize }}
           {% if post.authors %}
-            | 
-            {% for author in post.authors %}
-              <span title="Go to LinkedIn page of {{ author.name }}">
-                <a href="{{ author.link }}" target="_blank">{{ author.name }}</a>
-              </span>{% if forloop.last == false %}, {% endif %}
-            {% endfor %}
+            | {% for author in post.authors %}
+                <span title="Go to LinkedIn page of {{ author.name }}">
+                  <a href="{{ author.link }}" target="_blank">{{ author.name }}</a>
+                </span>{% if forloop.last == false %}, {% endif %}
+              {% endfor %}
           {% elsif post.author %}
             | <span title="Go to LinkedIn page of {{ post.author }}">
                 <a href="{{ post.author_link }}" target="_blank">{{ post.author }}</a>
@@ -51,7 +48,6 @@ title: "Foreign Trade Insights & Updates"
   </ul>
 {% endif %}
 
-<!-- OTHER NEWS SECTION -->
 {% if other_posts.size > 0 %}
   {% if latest_posts.size > 0 %}
     <h2>Other News</h2>
@@ -65,12 +61,11 @@ title: "Foreign Trade Insights & Updates"
         <small>
           {{ post.date | date: "%d %b %Y" }} | {{ post.category | capitalize }}
           {% if post.authors %}
-            | 
-            {% for author in post.authors %}
-              <span title="Go to LinkedIn page of {{ author.name }}">
-                <a href="{{ author.link }}" target="_blank">{{ author.name }}</a>
-              </span>{% if forloop.last == false %}, {% endif %}
-            {% endfor %}
+            | {% for author in post.authors %}
+                <span title="Go to LinkedIn page of {{ author.name }}">
+                  <a href="{{ author.link }}" target="_blank">{{ author.name }}</a>
+                </span>{% if forloop.last == false %}, {% endif %}
+              {% endfor %}
           {% elsif post.author %}
             | <span title="Go to LinkedIn page of {{ post.author }}">
                 <a href="{{ post.author_link }}" target="_blank">{{ post.author }}</a>
@@ -86,13 +81,13 @@ title: "Foreign Trade Insights & Updates"
 {% endif %}
 
 <script>
-const searchInput = document.getElementById('searchInput');
-searchInput.addEventListener('keyup', function(){
-  const filter = searchInput.value.toLowerCase();
-  const posts = document.querySelectorAll('.post-list li');
-  posts.forEach(post=>{
-    const text = post.innerText.toLowerCase();
-    post.style.display = text.includes(filter) ? '' : 'none';
+  const searchInput = document.getElementById('searchInput');
+  searchInput.addEventListener('keyup', function(){
+    const filter = searchInput.value.toLowerCase();
+    const posts = document.querySelectorAll('.post-list li');
+    posts.forEach(post => {
+      const text = post.innerText.toLowerCase();
+      post.style.display = text.includes(filter) ? '' : 'none';
+    });
   });
-});
 </script>
