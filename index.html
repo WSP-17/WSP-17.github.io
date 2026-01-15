@@ -8,6 +8,208 @@ title: "Foreign Trade Insights & Updates"
 {% assign latest_posts = "" | split: "" %}
 {% assign other_posts = "" | split: "" %}
 {% assign now = "now" | date: "%s" %}
+{% assign seven_days_seconds = 7 | times: 24 | times: 60 | times: 60 %}
+
+{% for post in site.posts %}
+  {% assign post_date = post.date | date: "%s" %}
+  {% assign diff = now | minus: post_date %}
+  {% if diff <= seven_days_seconds %}
+    {% assign latest_posts = latest_posts | push: post %}
+  {% else %}
+    {% assign other_posts = other_posts | push: post %}
+  {% endif %}
+{% endfor %}
+
+{% if latest_posts.size > 0 %}
+<h2>Latest News</h2>
+<ul class="post-list">
+  {% for post in latest_posts %}
+    {% assign words = post.content | number_of_words %}
+    {% assign read_time = words | divided_by: 180 | plus: 1 %}
+    <li class="post-card">
+      <a href="{{ post.url }}" class="card-link">
+        <div class="thumb">
+          {% if post.featured_image %}
+            <img src="{{ post.featured_image | relative_url }}" alt="{{ post.title }}" loading="lazy">
+          {% else %}
+            <img src="{{ '/assets/images/fallback.jpg' | relative_url }}" alt="Article image" loading="lazy">
+          {% endif %}
+          <span class="badge category">{{ post.category | capitalize }}</span>
+          <span class="badge new">NEW</span>
+        </div>
+        <div class="card-content">
+          <h3>{{ post.title }}</h3>
+          <small>
+            {{ post.date | date: "%d %b %Y" }} · {{ read_time }} min read
+            {% if post.authors %}
+              ·
+              {% for author in post.authors %}
+                {{ author.name }}{% if forloop.last == false %}, {% endif %}
+              {% endfor %}
+            {% elsif post.author %}
+              · {{ post.author }}
+            {% endif %}
+          </small>
+          {% if post.excerpt %}
+            <p class="excerpt">{{ post.excerpt }}</p>
+          {% endif %}
+        </div>
+      </a>
+    </li>
+  {% endfor %}
+</ul>
+{% endif %}
+
+{% if other_posts.size > 0 %}
+<h2>{% if latest_posts.size > 0 %}Other News{% else %}News{% endif %}</h2>
+<ul class="post-list">
+  {% for post in other_posts %}
+    {% assign words = post.content | number_of_words %}
+    {% assign read_time = words | divided_by: 180 | plus: 1 %}
+    <li class="post-card">
+      <a href="{{ post.url }}" class="card-link">
+        <div class="thumb">
+          {% if post.featured_image %}
+            <img src="{{ post.featured_image | relative_url }}" alt="{{ post.title }}" loading="lazy">
+          {% else %}
+            <img src="{{ '/assets/images/fallback.jpg' | relative_url }}" alt="Article image" loading="lazy">
+          {% endif %}
+          <span class="badge category">{{ post.category | capitalize }}</span>
+        </div>
+        <div class="card-content">
+          <h3>{{ post.title }}</h3>
+          <small>
+            {{ post.date | date: "%d %b %Y" }} · {{ read_time }} min read
+            {% if post.authors %}
+              ·
+              {% for author in post.authors %}
+                {{ author.name }}{% if forloop.last == false %}, {% endif %}
+              {% endfor %}
+            {% elsif post.author %}
+              · {{ post.author }}
+            {% endif %}
+          </small>
+          {% if post.excerpt %}
+            <p class="excerpt">{{ post.excerpt }}</p>
+          {% endif %}
+        </div>
+      </a>
+    </li>
+  {% endfor %}
+</ul>
+{% endif %}
+
+<style>
+.post-card {
+  background:#fff;
+  margin-bottom:20px;
+  border-radius:6px;
+  overflow:hidden;
+  box-shadow:0 2px 6px rgba(0,0,0,0.06);
+  transition:transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.post-card:hover {
+  transform:translateY(-3px);
+  box-shadow:0 6px 14px rgba(0,0,0,0.12);
+}
+
+.card-link {
+  display:flex;
+  text-decoration:none;
+  color:inherit;
+}
+
+.thumb {
+  position:relative;
+  width:220px;
+  flex-shrink:0;
+  overflow:hidden;
+}
+
+.thumb img {
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  transition:transform 0.3s ease;
+}
+
+.post-card:hover img {
+  transform:scale(1.05);
+}
+
+.badge {
+  position:absolute;
+  top:10px;
+  left:10px;
+  background:#0077cc;
+  color:white;
+  font-size:0.7rem;
+  padding:3px 6px;
+  border-radius:3px;
+}
+
+.badge.new {
+  left:auto;
+  right:10px;
+  background:#d32f2f;
+}
+
+.card-content {
+  padding:15px 18px;
+}
+
+.card-content h3 {
+  margin:0 0 6px 0;
+  font-size:1.15rem;
+}
+
+.card-content small {
+  color:#666;
+  font-size:0.8rem;
+}
+
+.excerpt {
+  margin-top:8px;
+  color:#444;
+  font-size:0.95rem;
+  display:-webkit-box;
+  -webkit-line-clamp:3;
+  -webkit-box-orient:vertical;
+  overflow:hidden;
+}
+
+@media (max-width: 768px) {
+  .card-link {
+    flex-direction:column;
+  }
+
+  .thumb {
+    width:100%;
+    height:180px;
+  }
+}
+</style>
+
+<script>
+const searchInput = document.getElementById('searchInput');
+searchInput.addEventListener('keyup', function(){
+  const filter = searchInput.value.toLowerCase();
+  document.querySelectorAll('.post-card').forEach(card => {
+    card.style.display = card.innerText.toLowerCase().includes(filter) ? '' : 'none';
+  });
+});
+</script>
+---
+layout: default
+title: "Foreign Trade Insights & Updates"
+---
+
+<input type="text" id="searchInput" placeholder="Search articles...">
+
+{% assign latest_posts = "" | split: "" %}
+{% assign other_posts = "" | split: "" %}
+{% assign now = "now" | date: "%s" %}
 
 {% for post in site.posts %}
   {% assign post_date = post.date | date: "%s" %}
