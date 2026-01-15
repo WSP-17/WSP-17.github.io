@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "India – Mexico Trade Tensions Amid 50% Tariffs"
-date: 2026-01-01
+date: 2026-01-12
 category: trade
 author: "Lavanya Pillai"
 author_link: "https://www.linkedin.com/in/lavanya-pillai-/"
