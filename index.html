@@ -3,7 +3,7 @@ layout: default
 title: "Foreign Trade Insights & Updates"
 ---
 
-<input type="text" id="searchInput" placeholder="Search articles...">
+<input type="text" id="searchInput" placeholder="Search articles..." class="search-bar">
 
 {% assign latest_posts = "" | split: "" %}
 {% assign other_posts = "" | split: "" %}
@@ -100,6 +100,16 @@ title: "Foreign Trade Insights & Updates"
 {% endif %}
 
 <style>
+.search-bar {
+  width: 100%;
+  padding: 12px 14px;
+  margin: 10px 0 30px 0;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  font-size: 1rem;
+  display: block;
+}
+
 .post-card {
   background:#fff;
   margin-bottom:20px;
