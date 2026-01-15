@@ -6,46 +6,54 @@ layout: default
 
 <h1>{{ page.title }}</h1>
 
-<p>
+<p style="margin-bottom:5px;">
   <em>{{ page.date | date: "%d %B %Y" }}</em> |
-  <span>
-    {% if page.authors %}
-      {% for author in page.authors %}
-        <span title="Go to LinkedIn page of {{ author.name }}">
-          <a href="{{ author.link }}" target="_blank">{{ author.name }}</a>
-        </span>{% if forloop.last == false %}, {% endif %}
-      {% endfor %}
-    {% else %}
-      <span title="Go to LinkedIn page of {{ page.author }}">
-        <a href="{{ page.author_link }}" target="_blank">{{ page.author }}</a>
-      </span>
-    {% endif %}
-  </span> |
-  {% if page.categories %}
-    {{ page.categories | join: ', ' | capitalize }}
+  {% if page.authors %}
+    {% for author in page.authors %}
+      <span title="Go to LinkedIn page of {{ author.name }}">
+        <a href="{{ author.link }}" target="_blank">{{ author.name }}</a>
+      </span>{% if forloop.last == false %}, {% endif %}
+    {% endfor %}
   {% else %}
-    {{ page.category | capitalize }}
+    <span title="Go to LinkedIn page of {{ page.author }}">
+      <a href="{{ page.author_link }}" target="_blank">{{ page.author }}</a>
+    </span>
   {% endif %}
+  | {{ page.category | capitalize }}
 </p>
 
-<hr>
+<hr style="margin-bottom:20px;">
 
-<!-- FEATURED IMAGE (optional) -->
+<!-- Featured Image -->
 {% if page.featured_image %}
   <figure style="margin:20px 0; text-align:center;">
-    <img 
-      src="{{ page.featured_image | relative_url }}" 
-      alt="{{ page.featured_image_alt | default: page.title }}"
-      style="max-width:100%; height:auto; display:block; margin:0 auto;">
-    {% if page.featured_image_caption %}
-      <figcaption style="font-size:0.85rem; color:#555; margin-top:5px;">
-        {{ page.featured_image_caption }}
-      </figcaption>
+    <img src="{{ page.featured_image | relative_url }}" alt="{{ page.title }}" style="max-width:100%; height:auto; border-radius:5px;">
+    {% if page.featured_caption %}
+      <figcaption style="font-size:0.85rem; color:#555; margin-top:5px;">{{ page.featured_caption }}</figcaption>
     {% endif %}
   </figure>
 {% endif %}
 
-<!-- ARTICLE CONTENT -->
-<div>
+<div class="post-content">
   {{ content }}
 </div>
+
+<style>
+.post-content img {
+  max-width:100%;
+  height:auto;
+  margin:15px 0;
+  border-radius:5px;
+}
+
+.post-content figure {
+  margin:20px 0;
+  text-align:center;
+}
+
+.post-content figcaption {
+  font-size:0.85rem;
+  color:#555;
+  margin-top:5px;
+}
+</style>
