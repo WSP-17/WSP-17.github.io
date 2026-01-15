@@ -5,7 +5,7 @@ layout: default
 <a href="{{ '/' | relative_url }}">← Back to Home</a>
 
 <!-- Post Title -->
-<h1 style="margin-top:0; text-align:center;">{{ page.title }}</h1>
+<h1 style="margin-top:20px; text-align:center;">{{ page.title }}</h1>
 
 <!-- Author / Date / Category -->
 <p style="margin-bottom:5px; text-align:center;">
@@ -26,13 +26,12 @@ layout: default
 
 <hr style="margin-bottom:20px;">
 
-<!-- Featured Image below title -->
+<!-- Featured Image -->
 {% if page.featured_image %}
   <figure style="margin:20px 0; text-align:center;">
     <img src="{{ page.featured_image | relative_url }}" 
          alt="{{ page.featured_image_alt | default: page.title }}" 
          style="max-width:100%; height:auto; border-radius:5px;">
-
     {% if page.featured_image_alt %}
       <figcaption style="font-style:italic; color:#555; font-size:0.85rem; margin-top:5px;">
         {{ page.featured_image_alt }}
@@ -49,21 +48,21 @@ layout: default
 <!-- Post Content Styling -->
 <style>
 .post-content img {
-  max-width:100%;
-  height:auto;
-  margin:15px 0;
-  border-radius:5px;
+  max-width: 100%;
+  height: auto;
+  margin: 15px 0;
+  border-radius: 5px;
 }
 
 .post-content figure {
-  margin:20px 0;
-  text-align:center;
+  margin: 20px 0;
+  text-align: center;
 }
 
 .post-content figcaption {
   font-style: italic;
-  color:#555;
-  font-size:0.85rem;
-  margin-top:5px;
+  color: #555;
+  font-size: 0.85rem;
+  margin-top: 5px;
 }
 </style>
