@@ -18,12 +18,29 @@
 <body>
 
 <header>
-  <h1>{{ site.title }}</h1>
-  <p>{{ site.description }}</p>
-  <nav>
-    <a href="{{ '/' | relative_url }}">Home</a>
-    <a href="{{ '/about/' | relative_url }}">About</a>
-  </nav>
+  <div style="display:flex; align-items:center; justify-content:center; gap:25px; flex-wrap:wrap;">
+
+    <!-- Logos -->
+    <div style="display:flex; align-items:center; gap:15px;">
+      <img src="{{ '/assets/images/logos/college-logo.png' | relative_url }}"
+           alt="College Logo"
+           style="height:55px;">
+      <img src="{{ '/assets/images/logos/club-logo.png' | relative_url }}"
+           alt="Club Logo"
+           style="height:55px;">
+    </div>
+
+    <!-- Title + nav -->
+    <div>
+      <h1 style="margin:0;">{{ site.title }}</h1>
+      <p style="margin:5px 0;">{{ site.description }}</p>
+      <nav>
+        <a href="{{ '/' | relative_url }}">Home</a>
+        <a href="{{ '/about/' | relative_url }}">About</a>
+      </nav>
+    </div>
+
+  </div>
 </header>
 
 <main>
