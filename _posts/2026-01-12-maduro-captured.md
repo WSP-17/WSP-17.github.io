@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Maduro Captured – What Happened?"
-date: 2026-01-03
+date: 2026-01-12
 category: world
 authors:
   - name: "Lavanya Pillai"
