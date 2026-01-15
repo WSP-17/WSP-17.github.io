@@ -4,20 +4,10 @@ layout: default
 
 <a href="{{ '/' | relative_url }}">← Back to Home</a>
 
-<!-- Featured Image -->
-{% if page.featured_image %}
-  <figure style="margin:20px 0; text-align:center;">
-    <img src="{{ page.featured_image | relative_url }}" 
-         alt="{{ page.featured_image_alt | default: page.title }}" 
-         style="max-width:100%; height:auto; border-radius:5px;">
-    {% if page.featured_caption %}
-      <figcaption style="font-size:0.85rem; color:#555; margin-top:5px;">{{ page.featured_caption }}</figcaption>
-    {% endif %}
-  </figure>
-{% endif %}
-
+<!-- Post Title -->
 <h1 style="margin-top:0; text-align:center;">{{ page.title }}</h1>
 
+<!-- Author / Date / Category -->
 <p style="margin-bottom:5px; text-align:center;">
   <em>{{ page.date | date: "%d %B %Y" }}</em> |
   {% if page.authors %}
@@ -36,10 +26,27 @@ layout: default
 
 <hr style="margin-bottom:20px;">
 
+<!-- Featured Image below title -->
+{% if page.featured_image %}
+  <figure style="margin:20px 0; text-align:center;">
+    <img src="{{ page.featured_image | relative_url }}" 
+         alt="{{ page.featured_image_alt | default: page.title }}" 
+         style="max-width:100%; height:auto; border-radius:5px;">
+
+    {% if page.featured_image_alt %}
+      <figcaption style="font-style:italic; color:#555; font-size:0.85rem; margin-top:5px;">
+        {{ page.featured_image_alt }}
+      </figcaption>
+    {% endif %}
+  </figure>
+{% endif %}
+
+<!-- Article Content -->
 <div class="post-content">
   {{ content }}
 </div>
 
+<!-- Post Content Styling -->
 <style>
 .post-content img {
   max-width:100%;
@@ -54,8 +61,9 @@ layout: default
 }
 
 .post-content figcaption {
-  font-size:0.85rem;
+  font-style: italic;
   color:#555;
+  font-size:0.85rem;
   margin-top:5px;
 }
 </style>
