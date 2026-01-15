@@ -6,6 +6,7 @@ category: trade
 author: "Lavanya Pillai"
 author_link: "https://www.linkedin.com/in/lavanya-pillai-/"
 excerpt: "Mexico introduces tariffs up to 50% on Indian goods, risking $5.75B exports. India negotiates exemptions and a potential FTA to protect industries."
+featured_image: "assets/images/posts/ind-mx-trade-tensions/ind-mx.jpg"
 ---
 
 Mexico's forthcoming implementation of a new tariff system, scheduled for January 1, 2026, represents a crucial shift in its trade policy, with notable implications for exporters from India. By implementing tariffs ranging from 5% to 50% on 1,463 product categories from countries without Free Trade Agreements (FTAs), Mexico aims to strengthen its domestic manufacturing sector and strategically position itself in anticipation of the 2026 review of the United States-Mexico-Canada Agreement (USMCA).
