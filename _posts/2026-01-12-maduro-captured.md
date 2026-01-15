@@ -3,8 +3,11 @@ layout: post
 title: "Maduro Captured – What Happened?"
 date: 2026-01-03
 category: world
-author: "Lavanya Pillai & Divyansh Sharma"
-author_link: "https://www.linkedin.com/in/lavanya-pillai-/"
+authors:
+  - name: "Lavanya Pillai"
+    link: "https://www.linkedin.com/in/lavanya-pillai-/"
+  - name: "Divyansh Sharma"
+    link: "https://www.linkedin.com/in/divyansh-sharma-h17/"
 excerpt: "U.S. Delta Force captures Venezuelan President Nicolás Maduro. Implications for oil markets, geopolitics, and regional security are significant."
 ---
 
