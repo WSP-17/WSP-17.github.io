@@ -1,14 +1,21 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <title>{{ page.title }}</title>
-</head>
-<body>
-  <a href="/">← Back to Home</a>
-  <h1>{{ page.title }}</h1>
-  <p><em>{{ page.date | date: "%d %B %Y" }}</em></p>
-  <hr>
+---
+layout: default
+---
+
+<a href="{{ '/' | relative_url }}">← Back to Home</a>
+
+<h1>{{ page.title }}</h1>
+
+<p>
+  <em>{{ page.date | date: "%d %B %Y" }}</em> |
+  <span title="Go to LinkedIn page of {{ page.author }}">
+    <a href="{{ page.author_link }}" target="_blank">{{ page.author }}</a>
+  </span> |
+  {{ page.category | capitalize }}
+</p>
+
+<hr>
+
+<div>
   {{ content }}
-</body>
-</html>
+</div>
