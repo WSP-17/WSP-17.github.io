@@ -8,10 +8,24 @@ layout: default
 
 <p>
   <em>{{ page.date | date: "%d %B %Y" }}</em> |
-  <span title="Go to LinkedIn page of {{ page.author }}">
-    <a href="{{ page.author_link }}" target="_blank">{{ page.author }}</a>
+  <span>
+    {% if page.authors %}
+      {% for author in page.authors %}
+        <span title="Go to LinkedIn page of {{ author.name }}">
+          <a href="{{ author.link }}" target="_blank">{{ author.name }}</a>
+        </span>{% if forloop.last == false %}, {% endif %}
+      {% endfor %}
+    {% else %}
+      <span title="Go to LinkedIn page of {{ page.author }}">
+        <a href="{{ page.author_link }}" target="_blank">{{ page.author }}</a>
+      </span>
+    {% endif %}
   </span> |
-  {{ page.category | capitalize }}
+  {% if page.categories %}
+    {{ page.categories | join: ', ' | capitalize }}
+  {% else %}
+    {{ page.category | capitalize }}
+  {% endif %}
 </p>
 
 <hr>
