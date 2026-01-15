@@ -6,7 +6,7 @@ category: geopolitics
 author: "Divyansh Sharma"
 author_link: "https://www.linkedin.com/in/divyansh-sharma-h17/"
 excerpt: "India and New Zealand completed negotiations on a landmark Free Trade Agreement, cementing a strategic partnership and including zero-duty access on most Indian goods."
-featured_image: "assets/images/posts/india-nz-fta/ind-nz-fta.jpeg"
+featured_image: "assets/images/posts/ind-nz-fta/ind-nz-fta.jpeg"
 featured_image_alt: "Indian PM Narendra Modi and his New Zealand counterpart Christopher Luxon"
 ---
 
