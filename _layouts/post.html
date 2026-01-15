@@ -4,9 +4,21 @@ layout: default
 
 <a href="{{ '/' | relative_url }}">← Back to Home</a>
 
-<h1>{{ page.title }}</h1>
+<!-- Featured Image -->
+{% if page.featured_image %}
+  <figure style="margin:20px 0; text-align:center;">
+    <img src="{{ page.featured_image | relative_url }}" 
+         alt="{{ page.featured_image_alt | default: page.title }}" 
+         style="max-width:100%; height:auto; border-radius:5px;">
+    {% if page.featured_caption %}
+      <figcaption style="font-size:0.85rem; color:#555; margin-top:5px;">{{ page.featured_caption }}</figcaption>
+    {% endif %}
+  </figure>
+{% endif %}
 
-<p style="margin-bottom:5px;">
+<h1 style="margin-top:0; text-align:center;">{{ page.title }}</h1>
+
+<p style="margin-bottom:5px; text-align:center;">
   <em>{{ page.date | date: "%d %B %Y" }}</em> |
   {% if page.authors %}
     {% for author in page.authors %}
@@ -23,16 +35,6 @@ layout: default
 </p>
 
 <hr style="margin-bottom:20px;">
-
-<!-- Featured Image -->
-{% if page.featured_image %}
-  <figure style="margin:20px 0; text-align:center;">
-    <img src="{{ page.featured_image | relative_url }}" alt="{{ page.title }}" style="max-width:100%; height:auto; border-radius:5px;">
-    {% if page.featured_caption %}
-      <figcaption style="font-size:0.85rem; color:#555; margin-top:5px;">{{ page.featured_caption }}</figcaption>
-    {% endif %}
-  </figure>
-{% endif %}
 
 <div class="post-content">
   {{ content }}
