@@ -5,14 +5,82 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{{ page.title | default: site.title }}</title>
   <style>
-    body { font-family: Arial, sans-serif; margin:0; padding:0 20px; background:#f9f9f9; color:#333; }
-    header { padding:20px 0; text-align:center; background:#222; color:white; }
-    nav a { color:white; margin-right:15px; text-decoration:none; }
-    main { max-width:900px; margin:20px auto; }
-    .post-list { list-style:none; padding:0; }
-    .post-list li { background:#fff; margin-bottom:10px; padding:10px 15px; border-left:5px solid #0077cc; }
-    .post-list li a { font-weight:bold; color:#0077cc; text-decoration:none; }
-    .post-list li small { display:block; color:#555; margin-top:3px; }
+    body {
+      font-family: Arial, sans-serif;
+      margin:0;
+      padding:0 20px;
+      background:#f9f9f9;
+      color:#333;
+    }
+
+    header {
+      padding:20px 0;
+      text-align:center;
+      background:#222;
+      color:white;
+    }
+
+    nav a {
+      color: #ffffff;
+      margin-right: 15px;
+      text-decoration: none;
+      font-weight: bold;
+      border-bottom: 2px solid transparent;
+    }
+
+    nav a:hover {
+      border-bottom: 2px solid #ffffff;
+    }
+
+    main {
+      max-width:900px;
+      margin:20px auto;
+    }
+
+    .post-list {
+      list-style:none;
+      padding:0;
+    }
+
+    .post-list li {
+      background:#fff;
+      margin-bottom:10px;
+      padding:10px 15px;
+      border-left:5px solid #0077cc;
+    }
+
+    .post-list li a {
+      font-weight:bold;
+      color:#0077cc;
+      text-decoration:none;
+    }
+
+    .post-list li small {
+      display:block;
+      color:#555;
+      margin-top:3px;
+    }
+
+    /* MOBILE FIX — KEEP LOGOS LEFT & RIGHT */
+    @media (max-width: 768px) {
+      header > div {
+        grid-template-columns: 70px 1fr 70px;
+        padding: 0 12px;
+      }
+
+      header img {
+        height: 60px !important;
+      }
+
+      header h1 {
+        font-size: 1.3rem;
+      }
+
+      header p {
+        font-size: 0.85rem;
+        opacity: 0.85;
+      }
+    }
   </style>
 </head>
 <body>
@@ -33,7 +101,9 @@
     <!-- Center content -->
     <div style="text-align:center;">
       <h1 style="margin:0;">{{ site.title }}</h1>
-      <p style="margin:5px 0;">{{ site.description }}</p>
+      <p style="margin:5px 0; font-size:0.9em; opacity:0.8;">
+        {{ site.description }}
+      </p>
       <nav>
         <a href="{{ '/' | relative_url }}">Home</a>
         <a href="{{ '/about/' | relative_url }}">About</a>
@@ -47,7 +117,7 @@
 
   </div>
 </header>
-  
+
 <main>
   {{ content }}
 </main>
@@ -70,12 +140,14 @@
 </button>
 
 <script>
-  // Back to top button
   const btn = document.getElementById('backToTop');
   window.onscroll = () => {
-    btn.style.display = (document.documentElement.scrollTop > 200) ? 'block' : 'none';
+    btn.style.display =
+      (document.documentElement.scrollTop > 200) ? 'block' : 'none';
   };
-  btn.onclick = () => window.scrollTo({top:0, behavior:'smooth'});
+  btn.onclick = () =>
+    window.scrollTo({top:0, behavior:'smooth'});
 </script>
+
 </body>
 </html>
