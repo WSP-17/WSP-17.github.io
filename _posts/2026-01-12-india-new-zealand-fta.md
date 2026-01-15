@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "India–New Zealand FTA – A New Delhi Dominance Show"
-date: 2025-01-12
+date: 2026-01-12
 category: geopolitics
 author: "Divyansh Sharma"
 author_link: "https://www.linkedin.com/in/divyansh-sharma-h17/"
