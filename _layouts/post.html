@@ -30,6 +30,22 @@ layout: default
 
 <hr>
 
+<!-- FEATURED IMAGE (optional) -->
+{% if page.featured_image %}
+  <figure style="margin:20px 0; text-align:center;">
+    <img 
+      src="{{ page.featured_image | relative_url }}" 
+      alt="{{ page.featured_image_alt | default: page.title }}"
+      style="max-width:100%; height:auto; display:block; margin:0 auto;">
+    {% if page.featured_image_caption %}
+      <figcaption style="font-size:0.85rem; color:#555; margin-top:5px;">
+        {{ page.featured_image_caption }}
+      </figcaption>
+    {% endif %}
+  </figure>
+{% endif %}
+
+<!-- ARTICLE CONTENT -->
 <div>
   {{ content }}
 </div>
