@@ -68,25 +68,36 @@
     }
 
     /* MOBILE FIX */
-    @media (max-width: 768px) {
-      header > div {
-        grid-template-columns: 60px 1fr 60px;
-        padding: 0 12px;
-      }
+@media (max-width: 768px) {
+  /* Reduce horizontal padding on mobile */
+  body {
+    padding: 0 12px;
+  }
 
-      header img {
-        height: 50px !important;
-      }
+  /* Header layout fix */
+  header > div {
+    grid-template-columns: 60px 1fr 60px;
+    padding: 0 12px;
+  }
 
-      header h1 {
-        font-size: 1.3rem;
-      }
+  header img {
+    height: 50px !important;
+  }
 
-      header p {
-        font-size: 0.85rem;
-        opacity: 0.8;
-      }
-    }
+  header h1 {
+    font-size: 1.3rem;
+  }
+
+  header p {
+    font-size: 0.85rem;
+    opacity: 0.8;
+  }
+
+  /* Ensure main content stays centered */
+  main {
+    margin: 0 auto;
+  }
+}
   </style>
 </head>
 <body>
