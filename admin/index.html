@@ -17,7 +17,6 @@ title: Admin
   <!-- EDITOR -->
   <div id="editor" style="display:none;">
     <h3>Post Editor</h3>
-
     <label>Title</label>
     <input id="title" style="width:100%;"><br><br>
 
@@ -27,22 +26,24 @@ title: Admin
     <label>Category</label>
     <input id="category"><br><br>
 
-    <label>Authors (JSON array)</label>
-    <textarea id="authors" rows="3">[
-  {"name":"Author Name","link":"https://example.com"}
-]</textarea><br><br>
+    <label>Authors</label>
+    <div id="authors"></div>
+    <button type="button" onclick="addAuthor()">+ Add Author</button><br><br>
 
     <label>Excerpt</label>
-    <textarea id="excerpt" rows="2"></textarea><br><br>
+    <textarea id="excerpt" rows="2" style="width:100%;"></textarea><br><br>
 
     <label>Featured Image Path</label>
-    <input id="image"><br><br>
+    <input id="image" style="width:100%;"><br><br>
 
     <label>Featured Image Alt</label>
-    <input id="imageAlt"><br><br>
+    <input id="imageAlt" style="width:100%;"><br><br>
 
     <label>Markdown Content</label>
     <textarea id="content" rows="15" style="width:100%;"></textarea><br><br>
+
+    <label>Update Existing Post?</label>
+    <input type="checkbox" id="update"><br><br>
 
     <button onclick="publish()">Publish / Update</button>
 
@@ -54,7 +55,7 @@ title: Admin
 </main>
 
 <script>
-let auth = false;
+let ADMIN = { username: '', password: '' };
 
 function login() {
   fetch('/.netlify/functions/github-post', {
@@ -64,40 +65,63 @@ function login() {
   .then(r => r.json())
   .then(d => {
     if (d.ok) {
+      ADMIN.username = user.value;
+      ADMIN.password = pass.value;
       loginBox.style.display = 'none';
       editor.style.display = 'block';
       heading.innerText = 'Admin Panel';
+      if (authors.innerHTML === '') addAuthor(); // start with 1 author field
     } else {
       loginMsg.innerText = 'Invalid credentials';
     }
   });
 }
 
+// Add author row dynamically
+function addAuthor(name='', link='') {
+  const div = document.createElement("div");
+  div.className = "author-row";
+  div.innerHTML = 
+    <input placeholder="Author name" value="${name}">
+    <input placeholder="Author link" value="${link}">
+    <button type="button" onclick="this.parentNode.remove()">❌</button>
+  ;
+  document.getElementById("authors").appendChild(div);
+}
+
+// Slugify function
 function slugify(text) {
   return text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 }
 
+// Publish / Update post
 function publish() {
   progress.value = 20;
   status.innerText = 'Preparing post...';
 
   const slug = slugify(title.value);
   const dateStr = date.value;
-  const filename = `${dateStr}-${slug}.md`;
+  const filename = ${dateStr}-${slug}.md;
 
-  const frontMatter = `---
+  const authorsArr = Array.from(document.querySelectorAll(".author-row"))
+    .map(r => {
+      const inputs = r.querySelectorAll("input");
+      return { name: inputs[0].value, link: inputs[1].value };
+    })
+    .filter(a => a.name);
+
+  const frontMatter = ---
 layout: post
 title: "${title.value}"
 date: ${dateStr}
 category: ${category.value}
-authors: ${authors.value}
+authors: ${JSON.stringify(authorsArr, null, 2)}
 excerpt: "${excerpt.value}"
 featured_image: "${image.value}"
 featured_image_alt: "${imageAlt.value}"
 ---
 
-${content.value}
-`;
+${content.value};
 
   progress.value = 50;
   status.innerText = 'Pushing to GitHub...';
@@ -107,13 +131,18 @@ ${content.value}
     body: JSON.stringify({
       action: 'publish',
       filename,
-      content: frontMatter
+      content: frontMatter,
+      update: document.getElementById('update').checked
     })
   })
   .then(r => r.json())
   .then(d => {
     progress.value = 100;
-    status.innerText = d.ok ? '✅ Published successfully' : '❌ Error publishing';
+    status.innerText = d.ok ? '✅ Published successfully' : '❌ Error publishing: ' + d.error;
+  })
+  .catch(err => {
+    progress.value = 0;
+    status.innerText = '❌ Network or function error: ' + err;
   });
 }
 </script>
