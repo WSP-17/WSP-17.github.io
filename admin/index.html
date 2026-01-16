@@ -1,4 +1,4 @@
----
+--- 
 layout: default
 title: Admin
 ---
@@ -17,6 +17,7 @@ title: Admin
   <!-- EDITOR -->
   <div id="editor" style="display:none;">
     <h3>Post Editor</h3>
+
     <label>Title</label>
     <input id="title" style="width:100%;"><br><br>
 
@@ -26,6 +27,7 @@ title: Admin
     <label>Category</label>
     <input id="category"><br><br>
 
+    <!-- Dynamic Authors -->
     <label>Authors</label>
     <div id="authors"></div>
     <button type="button" onclick="addAuthor()">+ Add Author</button><br><br>
@@ -42,7 +44,7 @@ title: Admin
     <label>Markdown Content</label>
     <textarea id="content" rows="15" style="width:100%;"></textarea><br><br>
 
-    <label>Update Existing Post?</label>
+    <label>Update existing post?</label>
     <input type="checkbox" id="update"><br><br>
 
     <button onclick="publish()">Publish / Update</button>
@@ -55,8 +57,9 @@ title: Admin
 </main>
 
 <script>
-let ADMIN = { username: '', password: '' };
+let auth = false;
 
+// LOGIN
 function login() {
   fetch('/.netlify/functions/github-post', {
     method: 'POST',
@@ -65,36 +68,35 @@ function login() {
   .then(r => r.json())
   .then(d => {
     if (d.ok) {
-      ADMIN.username = user.value;
-      ADMIN.password = pass.value;
       loginBox.style.display = 'none';
       editor.style.display = 'block';
       heading.innerText = 'Admin Panel';
-      if (authors.innerHTML === '') addAuthor(); // start with 1 author field
+      if(auth===false) addAuthor(); // add first author field by default
+      auth = true;
     } else {
       loginMsg.innerText = 'Invalid credentials';
     }
   });
 }
 
-// Add author row dynamically
-function addAuthor(name='', link='') {
+// DYNAMIC AUTHORS
+function addAuthor(name="", link="") {
   const div = document.createElement("div");
   div.className = "author-row";
   div.innerHTML = 
     <input placeholder="Author name" value="${name}">
     <input placeholder="Author link" value="${link}">
-    <button type="button" onclick="this.parentNode.remove()">❌</button>
+    <button type="button" onclick="this.parentNode.remove()">Remove</button>
   ;
   document.getElementById("authors").appendChild(div);
 }
 
-// Slugify function
+// SLUGIFY
 function slugify(text) {
   return text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 }
 
-// Publish / Update post
+// PUBLISH
 function publish() {
   progress.value = 20;
   status.innerText = 'Preparing post...';
@@ -103,9 +105,9 @@ function publish() {
   const dateStr = date.value;
   const filename = ${dateStr}-${slug}.md;
 
-  const authorsArr = Array.from(document.querySelectorAll(".author-row"))
-    .map(r => {
-      const inputs = r.querySelectorAll("input");
+  const authorsArray = Array.from(document.querySelectorAll(".author-row"))
+    .map(row => {
+      const inputs = row.querySelectorAll("input");
       return { name: inputs[0].value, link: inputs[1].value };
     })
     .filter(a => a.name);
@@ -115,12 +117,11 @@ layout: post
 title: "${title.value}"
 date: ${dateStr}
 category: ${category.value}
-authors: ${JSON.stringify(authorsArr, null, 2)}
+authors: ${JSON.stringify(authorsArray)}
 excerpt: "${excerpt.value}"
 featured_image: "${image.value}"
 featured_image_alt: "${imageAlt.value}"
 ---
-
 ${content.value};
 
   progress.value = 50;
@@ -132,17 +133,13 @@ ${content.value};
       action: 'publish',
       filename,
       content: frontMatter,
-      update: document.getElementById('update').checked
+      update: document.getElementById("update").checked
     })
   })
   .then(r => r.json())
   .then(d => {
     progress.value = 100;
     status.innerText = d.ok ? '✅ Published successfully' : '❌ Error publishing: ' + d.error;
-  })
-  .catch(err => {
-    progress.value = 0;
-    status.innerText = '❌ Network or function error: ' + err;
   });
 }
 </script>
