@@ -1,7 +1,7 @@
 source "https://rubygems.org"
 
 # Jekyll core
-gem "jekyll", "~> 5.0"
+gem "jekyll", "~> 4.1.1"
 
 # Needed for modern Ruby to run Jekyll server
 gem "webrick", "~> 1.8"
