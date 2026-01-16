@@ -1,60 +1,65 @@
-exports.handler = async (event) => {
-  const body = JSON.parse(event.body || "{}");
+const { Octokit } = require("@octokit/rest");
 
-  // LOGIN CHECK
-  if (body.action === "login") {
+exports.handler = async function(event) {
+  const body = JSON.parse(event.body || '{}');
+  const {
+    action, user, pass,
+    filename, content, update
+  } = body;
+
+  const ADMIN = {
+    username: process.env.ADMIN_USER,
+    password: process.env.ADMIN_PASS
+  };
+
+  if(action === 'login'){
     return {
       statusCode: 200,
-      body: JSON.stringify({
-        ok:
-          body.user === process.env.ADMIN_USER &&
-          body.pass === process.env.ADMIN_PASS
-      })
+      body: JSON.stringify({ ok: user === ADMIN.username && pass === ADMIN.password })
     };
   }
 
-  if (body.action !== "publish") {
-    return { statusCode: 400, body: "Invalid action" };
+  if(action !== 'publish') {
+    return { statusCode: 400, body: "Unknown action" };
   }
 
-  const {
-    GITHUB_TOKEN,
-    GITHUB_REPO_OWNER,
-    GITHUB_REPO_NAME,
-    GITHUB_BRANCH,
-    POSTS_PATH
-  } = process.env;
+  if(!user || !pass) return { statusCode: 401, body: "Unauthorized" };
 
-  const path = `${POSTS_PATH}/${body.filename}`;
-  const apiUrl = `https://api.github.com/repos/${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME}/contents/${path}`;
+  // GitHub API push
+  const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });
+  const owner = process.env.GITHUB_REPO_OWNER;
+  const repo = process.env.GITHUB_REPO_NAME;
+  const branch = process.env.GITHUB_BRANCH || 'main';
+  const postsPath = process.env.POSTS_PATH || "_posts";
 
-  // Check if file exists (edit vs new)
-  let sha = null;
-  const existing = await fetch(apiUrl, {
-    headers: { Authorization: `token ${GITHUB_TOKEN}` }
-  });
+  try {
+    // Check if file exists (for update)
+    let sha;
+    if(update){
+      try {
+        const resp = await octokit.repos.getContent({
+          owner, repo, path: ${postsPath}/${filename}, ref: branch
+        });
+        sha = resp.data.sha;
+      } catch(e){
+        // File does not exist
+      }
+    }
 
-  if (existing.status === 200) {
-    const data = await existing.json();
-    sha = data.sha;
-  }
-
-  const res = await fetch(apiUrl, {
-    method: "PUT",
-    headers: {
-      Authorization: `token ${GITHUB_TOKEN}`,
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      message: sha ? "Update post via admin" : "New post via admin",
-      content: Buffer.from(body.content).toString("base64"),
-      branch: GITHUB_BRANCH,
+    // Create/Update file
+    await octokit.repos.createOrUpdateFileContents({
+      owner,
+      repo,
+      path: ${postsPath}/${filename},
+      message: update ? Update post: ${filename} : Create post: ${filename},
+      content: Buffer.from(content).toString('base64'),
+      branch,
       sha
-    })
-  });
+    });
 
-  return {
-    statusCode: 200,
-    body: JSON.stringify({ ok: res.status === 201 || res.status === 200 })
-  };
+    return { statusCode: 200, body: JSON.stringify({ ok: true }) };
+  } catch(err) {
+    console.error(err);
+    return { statusCode: 500, body: JSON.stringify({ ok: false, error: err.message }) };
+  }
 };
