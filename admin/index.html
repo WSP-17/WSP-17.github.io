@@ -1,0 +1,119 @@
+---
+layout: default
+title: Admin
+---
+
+<main style="max-width:900px;margin:30px auto;">
+  <h2 id="heading">Admin Login</h2>
+
+  <!-- LOGIN -->
+  <div id="loginBox">
+    <input id="user" placeholder="Username"><br><br>
+    <input id="pass" type="password" placeholder="Password"><br><br>
+    <button onclick="login()">Login</button>
+    <p id="loginMsg"></p>
+  </div>
+
+  <!-- EDITOR -->
+  <div id="editor" style="display:none;">
+    <h3>Post Editor</h3>
+
+    <label>Title</label>
+    <input id="title" style="width:100%;"><br><br>
+
+    <label>Date</label>
+    <input id="date" type="date"><br><br>
+
+    <label>Category</label>
+    <input id="category"><br><br>
+
+    <label>Authors (JSON array)</label>
+    <textarea id="authors" rows="3">[
+  {"name":"Author Name","link":"https://example.com"}
+]</textarea><br><br>
+
+    <label>Excerpt</label>
+    <textarea id="excerpt" rows="2"></textarea><br><br>
+
+    <label>Featured Image Path</label>
+    <input id="image"><br><br>
+
+    <label>Featured Image Alt</label>
+    <input id="imageAlt"><br><br>
+
+    <label>Markdown Content</label>
+    <textarea id="content" rows="15" style="width:100%;"></textarea><br><br>
+
+    <button onclick="publish()">Publish / Update</button>
+
+    <div style="margin-top:20px;">
+      <progress id="progress" value="0" max="100" style="width:100%;"></progress>
+      <p id="status"></p>
+    </div>
+  </div>
+</main>
+
+<script>
+let auth = false;
+
+function login() {
+  fetch('/.netlify/functions/github-post', {
+    method: 'POST',
+    body: JSON.stringify({ action: 'login', user: user.value, pass: pass.value })
+  })
+  .then(r => r.json())
+  .then(d => {
+    if (d.ok) {
+      loginBox.style.display = 'none';
+      editor.style.display = 'block';
+      heading.innerText = 'Admin Panel';
+    } else {
+      loginMsg.innerText = 'Invalid credentials';
+    }
+  });
+}
+
+function slugify(text) {
+  return text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+}
+
+function publish() {
+  progress.value = 20;
+  status.innerText = 'Preparing post...';
+
+  const slug = slugify(title.value);
+  const dateStr = date.value;
+  const filename = `${dateStr}-${slug}.md`;
+
+  const frontMatter = `---
+layout: post
+title: "${title.value}"
+date: ${dateStr}
+category: ${category.value}
+authors: ${authors.value}
+excerpt: "${excerpt.value}"
+featured_image: "${image.value}"
+featured_image_alt: "${imageAlt.value}"
+---
+
+${content.value}
+`;
+
+  progress.value = 50;
+  status.innerText = 'Pushing to GitHub...';
+
+  fetch('/.netlify/functions/github-post', {
+    method: 'POST',
+    body: JSON.stringify({
+      action: 'publish',
+      filename,
+      content: frontMatter
+    })
+  })
+  .then(r => r.json())
+  .then(d => {
+    progress.value = 100;
+    status.innerText = d.ok ? '✅ Published successfully' : '❌ Error publishing';
+  });
+}
+</script>
