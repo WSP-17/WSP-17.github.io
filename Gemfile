@@ -1,5 +1,3 @@
-# Gemfile
-
 ruby "3.3.0"  # Compatible Ruby version for Netlify + Jekyll 4.x
 
 source "https://rubygems.org"
