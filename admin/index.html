@@ -63,91 +63,82 @@ title: Admin
 </main>
 
 <script>
-const ADMIN = { username: 'hidden', password: 'hidden' }; // ignored, function uses env
-
+/* ==== GLOBALS (required for inline onclick) ==== */
 function login() {
-  fetch('/.netlify/functions/github-post', {
-    method: 'POST',
-    body: JSON.stringify({ action: 'login', user: user.value, pass: pass.value })
+  const user = document.getElementById("user").value;
+  const pass = document.getElementById("pass").value;
+
+  fetch("/.netlify/functions/github-post", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      action: "login",
+      user,
+      pass
+    })
   })
   .then(r => r.json())
   .then(d => {
     if (d.ok) {
-      loginBox.style.display = 'none';
-      editor.style.display = 'block';
-      heading.innerText = 'Admin Panel';
-      addAuthor(); // add initial author field
+      document.getElementById("loginBox").style.display = "none";
+      document.getElementById("editor").style.display = "block";
+      document.getElementById("heading").innerText = "Admin Panel";
     } else {
-      loginMsg.innerText = 'Invalid credentials';
+      document.getElementById("loginMsg").innerText = "Invalid credentials";
     }
+  })
+  .catch(err => {
+    document.getElementById("loginMsg").innerText = "Login error";
+    console.error(err);
   });
 }
 
-function addAuthor(name='', link='') {
-  const div = document.createElement("div");
-  div.className = "author-row";
-  div.innerHTML = 
-    <input placeholder="Author name" value="${name}">
-    <input placeholder="Author link" value="${link}">
-    <button type="button" onclick="this.parentNode.remove()">Remove</button>
-  ;
-  document.getElementById("authors").appendChild(div);
-}
-
+/* ==== HELPERS ==== */
 function slugify(text) {
-  return text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+  return text
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "");
 }
 
-function togglePreview() {
-  const preview = document.getElementById("preview");
-  if (document.getElementById("showPreview").checked) {
-    preview.classList.remove("hidden");
-    preview.innerText = content.value;
-  } else {
-    preview.classList.add("hidden");
-  }
-}
+function publish() {
+  const title = document.getElementById("title").value;
+  const date = document.getElementById("date").value;
+  const category = document.getElementById("category").value;
+  const excerpt = document.getElementById("excerpt").value;
+  const image = document.getElementById("image").value;
+  const imageAlt = document.getElementById("imageAlt").value;
+  const content = document.getElementById("content").value;
 
-async function publish() {
-  const authors = Array.from(document.querySelectorAll(".author-row"))
-    .map(row => {
-      const inputs = row.querySelectorAll("input");
-      return { name: inputs[0].value, link: inputs[1].value };
-    })
-    .filter(a => a.name);
+  const slug = slugify(title);
+  const filename = `${date}-${slug}.md`;
 
-  const slug = slugify(title.value);
-  const dateStr = date.value;
-  const filename = ${dateStr}-${slug}.md;
+  document.getElementById("progress").value = 40;
+  document.getElementById("status").innerText = "Publishing…";
 
-  const frontMatter = ---
-layout: post
-title: "${title.value}"
-date: ${dateStr}
-category: ${category.value}
-authors: ${JSON.stringify(authors)}
-excerpt: "${excerpt.value}"
-featured_image: "${image.value}"
-featured_image_alt: "${imageAlt.value}"
----
-${content.value};
-
-  progress.value = 20;
-  status.innerText = 'Preparing post...';
-
-  const res = await fetch('/.netlify/functions/github-post', {
-    method: 'POST',
+  fetch("/.netlify/functions/github-post", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
     body: JSON.stringify({
-      action: 'publish',
+      action: "publish",
       filename,
-      content: frontMatter,
-      update: document.getElementById("update").checked
+      content
     })
+  })
+  .then(r => r.json())
+  .then(d => {
+    document.getElementById("progress").value = 100;
+    document.getElementById("status").innerText =
+      d.ok ? "✅ Published successfully" : "❌ Publish failed";
+  })
+  .catch(err => {
+    document.getElementById("status").innerText = "❌ Network error";
+    console.error(err);
   });
-
-const data = await res.json();
-  progress.value = 100;
-  status.innerText = data.ok ? '✅ Published successfully' : ❌ ${data.error || 'Error publishing'};
 }
 </script>
 <style>
