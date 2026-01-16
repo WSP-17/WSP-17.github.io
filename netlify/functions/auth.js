@@ -1,13 +1,20 @@
-exports.handler = async (event) => {
+export async function handler(event) {
   if (event.httpMethod !== "POST") {
     return { statusCode: 405, body: "Method Not Allowed" };
   }
 
-  const { username, password } = JSON.parse(event.body || "{}");
+  let body;
+  try {
+    body = JSON.parse(event.body);
+  } catch {
+    return { statusCode: 400, body: JSON.stringify({ ok: false }) };
+  }
+
+  const { user, pass } = body;
 
   if (
-    username === process.env.ADMIN_USER &&
-    password === process.env.ADMIN_PASS
+    user === process.env.ADMIN_USER &&
+    pass === process.env.ADMIN_PASS
   ) {
     return {
       statusCode: 200,
@@ -19,4 +26,4 @@ exports.handler = async (event) => {
     statusCode: 401,
     body: JSON.stringify({ ok: false })
   };
-};
+}
