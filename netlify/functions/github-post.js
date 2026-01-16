@@ -1,117 +1,137 @@
-import fetch from "node-fetch";
-
-// Helper to slugify title for filename
-function slugify(text) {
-  return text
-    .toString()
-    .toLowerCase()
-    .replace(/\s+/g, "-")           // Replace spaces with -
-    .replace(/[^\w\-]+/g, "")       // Remove all non-word chars
-    .replace(/\-\-+/g, "-")         // Replace multiple - with single -
-    .replace(/^-+/, "")             // Trim - from start
-    .replace(/-+$/, "");            // Trim - from end
-}
-
-// Create markdown front matter
-function generateMarkdown(data) {
-  const {
-    title,
-    date,
-    category,
-    authors,
-    excerpt,
-    featured_image,
-    featured_image_alt,
-    content
-  } = data;
-
-  const authorsYaml = authors
-    ? authors.map(a =>   - name: "${a.name}"\n    link: "${a.link}").join("\n")
-    : "";
-
-  return ---
-layout: post
-title: "${title}"
-date: ${date}
-category: ${category}
-authors:
-${authorsYaml}
-excerpt: "${excerpt || ""}"
-featured_image: "${featured_image || ""}"
-featured_image_alt: "${featured_image_alt || ""}"
----
-${content}
-;
-}
-
-export async function handler(event, context) {
+exports.handler = async function (event) {
   if (event.httpMethod !== "POST") {
     return { statusCode: 405, body: "Method Not Allowed" };
   }
 
-  // Basic auth
-  const { username, password, post } = JSON.parse(event.body);
-  if (
-    username !== process.env.ADMIN_USER ||
-    password !== process.env.ADMIN_PASS
-  ) {
-    return { statusCode: 401, body: "Unauthorized" };
-  }
+  try {
+    const {
+      username,
+      password,
+      title,
+      date,
+      category,
+      authors,
+      excerpt,
+      featured_image,
+      featured_image_alt,
+      content,
+      slug,
+      update = false
+    } = JSON.parse(event.body);
 
-  // Repo info
-  const owner = process.env.GITHUB_REPO_OWNER;
-  const repo = process.env.GITHUB_REPO_NAME;
-  const branch = process.env.GITHUB_BRANCH || "main";
-  const token = process.env.GITHUB_TOKEN;
+    /* ===============================
+       1. AUTHENTICATION (SECURE)
+    =============================== */
+    if (
+      username !== process.env.ADMIN_USER ||
+      password !== process.env.ADMIN_PASS
+    ) {
+      return { statusCode: 401, body: "Unauthorized" };
+    }
 
-  // Generate filename: YYYY-MM-DD-slug.md
-  const dateObj = new Date(post.date);
-  const yyyy = dateObj.getFullYear();
-  const mm = String(dateObj.getMonth() + 1).padStart(2, "0");
-  const dd = String(dateObj.getDate()).padStart(2, "0");
-  const slug = slugify(post.title);
-  const filename = _posts/${yyyy}-${mm}-${dd}-${slug}.md;
+    /* ===============================
+       2. BASIC VALIDATION
+       (this is the “validating thingy”)
+       → prevents broken posts
+    =============================== */
+    if (!title  !date  !content) {
+      return {
+        statusCode: 400,
+        body: "Missing required fields (title, date, content)"
+      };
+    }
 
-  const content = generateMarkdown(post);
+    /* ===============================
+       3. SLUG + FILENAME
+    =============================== */
+    const safeSlug =
+      slug ||
+      title
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/(^-|-$)/g, "");
 
-  // Check if file exists first (GitHub API)
-  const getUrl = https://api.github.com/repos/${owner}/${repo}/contents/${filename}?ref=${branch};
-  const getRes = await fetch(getUrl, {
-    headers: { Authorization: token ${token} },
-  });
-  let sha = null;
-  if (getRes.status === 200) {
-    const data = await getRes.json();
-    sha = data.sha; // needed for updating existing file
-  }
+    const fileName = ${date}-${safeSlug}.md;
+    const filePath = _posts/${fileName};
 
-  const url = https://api.github.com/repos/${owner}/${repo}/contents/${filename};
-  const payload = {
-    message: sha ? Update post: ${post.title} : Add new post: ${post.title},
-    content: Buffer.from(content).toString("base64"),
-    branch,
-  };
-  if (sha) payload.sha = sha;
+    /* ===============================
+       4. FRONT MATTER (YOUR STRUCTURE)
+    =============================== */
+    const frontMatter = ---
+layout: post
+title: "${title.replace(/"/g, '\\"')}"
+date: ${date}
+category: ${category || "general"}
+authors:
+${(authors || []).map(a =>   - name: "${a.name}"\n    link: "${a.link}").join("\n")}
+${excerpt ? excerpt: "${excerpt.replace(/"/g, '\\"')}" : ""}
+${featured_image ? featured_image: "${featured_image}" : ""}
+${featured_image_alt ? featured_image_alt: "${featured_image_alt}" : ""}
+---
 
-  const res = await fetch(url, {
-    method: "PUT",
-    headers: {
-      Authorization: token ${token},
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(payload),
-  });
+${content}
+;
 
-  const result = await res.json();
-  if (res.status >= 200 && res.status < 300) {
+    /* ===============================
+       5. GITHUB API DETAILS
+    =============================== */
+    const owner = process.env.GITHUB_REPO_OWNER;
+    const repo = process.env.GITHUB_REPO_NAME;
+    const branch = process.env.GITHUB_BRANCH;
+    const token = process.env.GITHUB_TOKEN;
+
+    const apiUrl = https://api.github.com/repos/${owner}/${repo}/contents/${filePath};
+
+    /* ===============================
+       6. CHECK IF FILE EXISTS
+    =============================== */
+    let sha = null;
+    const existing = await fetch(${apiUrl}?ref=${branch}, {
+      headers: {
+        Authorization: Bearer ${token},
+        Accept: "application/vnd.github+json"
+      }
+    });
+
+    if (existing.ok) {
+      const data = await existing.json();
+      sha = data.sha;
+    }
+
+    /* ===============================
+       7. CREATE OR UPDATE FILE
+    =============================== */
+    const response = await fetch(apiUrl, {
+      method: "PUT",
+      headers: {
+        Authorization: Bearer ${token},
+        Accept: "application/vnd.github+json",
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        message: update
+          ? Update post: ${title}
+          : New post: ${title},
+        content: Buffer.from(frontMatter).toString("base64"),
+        branch,
+        ...(sha && { sha })
+      })
+    });
+
+    if (!response.ok) {
+      const error = await response.text();
+      return { statusCode: 500, body: error };
+    }
+
     return {
       statusCode: 200,
-      body: JSON.stringify({ message: "Post saved successfully!", result }),
+      body: JSON.stringify({
+        success: true,
+        file: fileName,
+        mode: sha ? "updated" : "created"
+      })
     };
-  } else {
-    return {
-      statusCode: res.status,
-      body: JSON.stringify({ message: "Failed to save post", result }),
-    };
+  } catch (err) {
+    return { statusCode: 500, body: err.message };
   }
-}
+};
