@@ -1,13 +1,16 @@
-export async function handler(event) {
+exports.handler = async (event) => {
   if (event.httpMethod !== "POST") {
     return { statusCode: 405, body: "Method Not Allowed" };
   }
 
   let body;
   try {
-    body = JSON.parse(event.body);
+    body = JSON.parse(event.body || "{}");
   } catch {
-    return { statusCode: 400, body: JSON.stringify({ ok: false }) };
+    return {
+      statusCode: 400,
+      body: JSON.stringify({ ok: false })
+    };
   }
 
   const { user, pass } = body;
@@ -26,4 +29,4 @@ export async function handler(event) {
     statusCode: 401,
     body: JSON.stringify({ ok: false })
   };
-}
+};
