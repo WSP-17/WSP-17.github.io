@@ -8,7 +8,7 @@ exports.handler = async function(event, context) {
   const REPO_OWNER = env.GITHUB_REPO_OWNER;
   const REPO_NAME = env.GITHUB_REPO_NAME;
   const BRANCH = env.GITHUB_BRANCH;
-  const POSTS_PATH = env.POSTS_PATH || '_posts';
+  const POSTS_PATH = env.POSTS_PATH;
   const IMAGES_PATH = 'assets/images/posts';
 
   try {
