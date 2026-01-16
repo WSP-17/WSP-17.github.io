@@ -7,26 +7,18 @@ exports.handler = async (event) => {
   try {
     body = JSON.parse(event.body || "{}");
   } catch {
-    return {
-      statusCode: 400,
-      body: JSON.stringify({ ok: false })
-    };
+    return { statusCode: 400, body: JSON.stringify({ ok: false }) };
   }
 
   const { user, pass } = body;
 
-  if (
-    user === process.env.ADMIN_USER &&
-    pass === process.env.ADMIN_PASS
-  ) {
-    return {
-      statusCode: 200,
-      body: JSON.stringify({ ok: true })
-    };
+  // DEBUG LOG: check if env vars exist
+  console.log("ADMIN_USER exists?", !!process.env.ADMIN_USER);
+  console.log("ADMIN_PASS exists?", !!process.env.ADMIN_PASS);
+
+  if (user === process.env.ADMIN_USER && pass === process.env.ADMIN_PASS) {
+    return { statusCode: 200, body: JSON.stringify({ ok: true }) };
   }
 
-  return {
-    statusCode: 401,
-    body: JSON.stringify({ ok: false })
-  };
+  return { statusCode: 401, body: JSON.stringify({ ok: false }) };
 };
