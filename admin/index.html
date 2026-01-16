@@ -63,36 +63,30 @@ title: Admin
 </main>
 
 <script>
-/* ==== GLOBALS (required for inline onclick) ==== */
+/* ==== LOGIN ==== */
 function login() {
   const user = document.getElementById("user").value;
   const pass = document.getElementById("pass").value;
 
-  fetch("/.netlify/functions/github-post", {
+  fetch("/.netlify/functions/auth", {  // Correct function endpoint
     method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      action: "login",
-      user,
-      pass
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ user, pass })
+  })
+    .then(r => r.json())
+    .then(d => {
+      if (d.ok) {
+        document.getElementById("loginBox").style.display = "none";
+        document.getElementById("editor").style.display = "block";
+        document.getElementById("heading").innerText = "Admin Panel";
+      } else {
+        document.getElementById("loginMsg").innerText = "Invalid credentials";
+      }
     })
-  })
-  .then(r => r.json())
-  .then(d => {
-    if (d.ok) {
-      document.getElementById("loginBox").style.display = "none";
-      document.getElementById("editor").style.display = "block";
-      document.getElementById("heading").innerText = "Admin Panel";
-    } else {
-      document.getElementById("loginMsg").innerText = "Invalid credentials";
-    }
-  })
-  .catch(err => {
-    document.getElementById("loginMsg").innerText = "Login error";
-    console.error(err);
-  });
+    .catch(err => {
+      document.getElementById("loginMsg").innerText = "Login error";
+      console.error(err);
+    });
 }
 
 /* ==== HELPERS ==== */
@@ -103,6 +97,7 @@ function slugify(text) {
     .replace(/(^-|-$)/g, "");
 }
 
+/* ==== PUBLISH ==== */
 function publish() {
   const title = document.getElementById("title").value;
   const date = document.getElementById("date").value;
@@ -113,32 +108,41 @@ function publish() {
   const content = document.getElementById("content").value;
 
   const slug = slugify(title);
-  const filename = `${date}-${slug}.md`;
+  const filename = ${date}-${slug}.md;
 
   document.getElementById("progress").value = 40;
   document.getElementById("status").innerText = "Publishing…";
 
   fetch("/.netlify/functions/github-post", {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
-      action: "publish",
       filename,
       content
     })
   })
-  .then(r => r.json())
-  .then(d => {
-    document.getElementById("progress").value = 100;
-    document.getElementById("status").innerText =
-      d.ok ? "✅ Published successfully" : "❌ Publish failed";
-  })
-  .catch(err => {
-    document.getElementById("status").innerText = "❌ Network error";
-    console.error(err);
-  });
+    .then(r => r.json())
+    .then(d => {
+      document.getElementById("progress").value = 100;
+      document.getElementById("status").innerText =
+        d.ok ? "✅ Published successfully" : "❌ Publish failed";
+    })
+    .catch(err => {
+      document.getElementById("status").innerText = "❌ Network error";
+      console.error(err);
+    });
+}
+
+/* ==== PREVIEW TOGGLE ==== */
+function togglePreview() {
+  const preview = document.getElementById("preview");
+  const show = document.getElementById("showPreview").checked;
+  if (show) {
+    preview.style.display = "block";
+    preview.innerText = document.getElementById("content").value;
+  } else {
+    preview.style.display = "none";
+  }
 }
 </script>
 <style>
