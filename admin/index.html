@@ -1,5 +1,4 @@
---- 
-layout: default
+---layout: default
 title: Admin
 ---
 
@@ -9,7 +8,7 @@ title: Admin
   <!-- LOGIN -->
   <div id="loginBox">
     <input id="user" placeholder="Username"><br><br>
-    <input id="pass" type="password" placeholder="Password"><br><br>
+    <input id="pass" type="password" placeholder="Password" type="password"><br><br>
     <button onclick="login()">Login</button>
     <p id="loginMsg"></p>
   </div>
@@ -27,25 +26,31 @@ title: Admin
     <label>Category</label>
     <input id="category"><br><br>
 
-    <!-- Dynamic Authors -->
     <label>Authors</label>
     <div id="authors"></div>
-    <button type="button" onclick="addAuthor()">+ Add Author</button><br><br>
+    <button type="button" onclick="addAuthor()">Add Author</button><br><br>
 
     <label>Excerpt</label>
     <textarea id="excerpt" rows="2" style="width:100%;"></textarea><br><br>
 
     <label>Featured Image Path</label>
-    <input id="image" style="width:100%;"><br><br>
+    <input id="image" placeholder="assets/images/posts/postname/image.jpg"><br><br>
 
     <label>Featured Image Alt</label>
-    <input id="imageAlt" style="width:100%;"><br><br>
+    <input id="imageAlt"><br><br>
 
     <label>Markdown Content</label>
     <textarea id="content" rows="15" style="width:100%;"></textarea><br><br>
 
-    <label>Update existing post?</label>
-    <input type="checkbox" id="update"><br><br>
+    <label>
+      <input type="checkbox" id="update"> Update existing post
+    </label><br><br>
+
+    <label>
+      <input type="checkbox" id="showPreview" onchange="togglePreview()"> Show Preview
+    </label><br><br>
+
+    <div id="preview" class="hidden" style="border:1px solid #ccc;padding:10px;margin:10px 0;white-space:pre-wrap;"></div>
 
     <button onclick="publish()">Publish / Update</button>
 
@@ -57,9 +62,8 @@ title: Admin
 </main>
 
 <script>
-let auth = false;
+const ADMIN = { username: 'hidden', password: 'hidden' }; // ignored, function uses env
 
-// LOGIN
 function login() {
   fetch('/.netlify/functions/github-post', {
     method: 'POST',
@@ -71,16 +75,14 @@ function login() {
       loginBox.style.display = 'none';
       editor.style.display = 'block';
       heading.innerText = 'Admin Panel';
-      if(auth===false) addAuthor(); // add first author field by default
-      auth = true;
+      addAuthor(); // add initial author field
     } else {
       loginMsg.innerText = 'Invalid credentials';
     }
   });
 }
 
-// DYNAMIC AUTHORS
-function addAuthor(name="", link="") {
+function addAuthor(name='', link='') {
   const div = document.createElement("div");
   div.className = "author-row";
   div.innerHTML = 
@@ -91,43 +93,48 @@ function addAuthor(name="", link="") {
   document.getElementById("authors").appendChild(div);
 }
 
-// SLUGIFY
 function slugify(text) {
   return text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 }
 
-// PUBLISH
-function publish() {
-  progress.value = 20;
-  status.innerText = 'Preparing post...';
+function togglePreview() {
+  const preview = document.getElementById("preview");
+  if (document.getElementById("showPreview").checked) {
+    preview.classList.remove("hidden");
+    preview.innerText = content.value;
+  } else {
+    preview.classList.add("hidden");
+  }
+}
 
-  const slug = slugify(title.value);
-  const dateStr = date.value;
-  const filename = ${dateStr}-${slug}.md;
-
-  const authorsArray = Array.from(document.querySelectorAll(".author-row"))
+async function publish() {
+  const authors = Array.from(document.querySelectorAll(".author-row"))
     .map(row => {
       const inputs = row.querySelectorAll("input");
       return { name: inputs[0].value, link: inputs[1].value };
     })
     .filter(a => a.name);
 
+  const slug = slugify(title.value);
+  const dateStr = date.value;
+  const filename = ${dateStr}-${slug}.md;
+
   const frontMatter = ---
 layout: post
 title: "${title.value}"
 date: ${dateStr}
 category: ${category.value}
-authors: ${JSON.stringify(authorsArray)}
+authors: ${JSON.stringify(authors)}
 excerpt: "${excerpt.value}"
 featured_image: "${image.value}"
 featured_image_alt: "${imageAlt.value}"
 ---
 ${content.value};
 
-  progress.value = 50;
-  status.innerText = 'Pushing to GitHub...';
+  progress.value = 20;
+  status.innerText = 'Preparing post...';
 
-  fetch('/.netlify/functions/github-post', {
+  const res = await fetch('/.netlify/functions/github-post', {
     method: 'POST',
     body: JSON.stringify({
       action: 'publish',
@@ -135,11 +142,15 @@ ${content.value};
       content: frontMatter,
       update: document.getElementById("update").checked
     })
-  })
-  .then(r => r.json())
-  .then(d => {
-    progress.value = 100;
-    status.innerText = d.ok ? '✅ Published successfully' : '❌ Error publishing: ' + d.error;
   });
+
+const data = await res.json();
+  progress.value = 100;
+  status.innerText = data.ok ? '✅ Published successfully' : ❌ ${data.error || 'Error publishing'};
 }
 </script>
+<style>
+.hidden { display:none; }
+.author-row { margin-bottom:5px; }
+.author-row input { margin-right:5px; }
+</style>
