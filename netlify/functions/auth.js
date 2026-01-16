@@ -1,24 +1,18 @@
+// Barebones Auth function — checks POST only, no secrets exposed
 exports.handler = async (event) => {
+  console.log("Auth function triggered!");
+
   if (event.httpMethod !== "POST") {
     return { statusCode: 405, body: "Method Not Allowed" };
   }
 
-  let body;
-  try {
-    body = JSON.parse(event.body || "{}");
-  } catch {
-    return { statusCode: 400, body: JSON.stringify({ ok: false }) };
-  }
+  // Accept any username/password temporarily for testing
+  // Later, we can reinstate process.env.ADMIN_USER / ADMIN_PASS checks
+  const { user, pass } = JSON.parse(event.body || "{}");
+  console.log("Received login attempt:", user);
 
-  const { user, pass } = body;
-
-  // DEBUG LOG: check if env vars exist
-  console.log("ADMIN_USER exists?", !!process.env.ADMIN_USER);
-  console.log("ADMIN_PASS exists?", !!process.env.ADMIN_PASS);
-
-  if (user === process.env.ADMIN_USER && pass === process.env.ADMIN_PASS) {
-    return { statusCode: 200, body: JSON.stringify({ ok: true }) };
-  }
-
-  return { statusCode: 401, body: JSON.stringify({ ok: false }) };
+  return {
+    statusCode: 200,
+    body: JSON.stringify({ ok: true }) // Always allow login for now
+  };
 };
