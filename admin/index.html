@@ -10,8 +10,8 @@ title: Admin
   <div id="loginBox">
     <input id="user" placeholder="Username"><br><br>
     <input id="pass" type="password" placeholder="Password"><br><br>
-    <button onclick="login()">Login</button>
-    <p id="loginMsg" style="color:red;"></p>
+    <button id="loginBtn">Login</button>
+    <p id="loginMsg"></p>
   </div>
 
   <!-- EDITOR -->
@@ -63,101 +63,121 @@ title: Admin
 </main>
 
 <script>
-/* ==== LOGIN ==== */
-function login() {
-  const user = document.getElementById("user").value.trim();
-  const pass = document.getElementById("pass").value.trim();
+document.addEventListener("DOMContentLoaded", () => {
+  const loginBtn = document.getElementById("loginBtn");
+  const showPreviewCheckbox = document.getElementById("showPreview");
+  const contentInput = document.getElementById("content");
 
-  if (!user || !pass) {
-    document.getElementById("loginMsg").innerText = "Enter username and password";
-    return;
-  }
+  // ==== LOGIN ====
+  loginBtn.addEventListener("click", login);
 
-  fetch("/.netlify/functions/auth", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ user, pass })
-  })
-    .then(r => r.json())
-    .then(d => {
-      if (d.ok) {
-        document.getElementById("loginBox").style.display = "none";
-        document.getElementById("editor").style.display = "block";
-        document.getElementById("heading").innerText = "Admin Panel";
-        addAuthor(); // add initial author row
-      } else {
-        document.getElementById("loginMsg").innerText = "Invalid credentials";
-      }
+  function login() {
+    const user = document.getElementById("user").value.trim();
+    const pass = document.getElementById("pass").value.trim();
+
+    if (!user || !pass) {
+      document.getElementById("loginMsg").innerText = "Enter username and password";
+      return;
+    }
+
+    console.log("Login attempt:", user);
+
+    fetch("/.netlify/functions/auth", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ user, pass })
     })
-    .catch(err => {
-      document.getElementById("loginMsg").innerText = "Login error";
-      console.error(err);
-    });
-}
-
-/* ==== HELPERS ==== */
-function slugify(text) {
-  return text.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
-}
-
-/* ==== AUTHORS DYNAMIC FIELDS ==== */
-function addAuthor(name="", link="") {
-  const authorsDiv = document.getElementById("authors");
-  const row = document.createElement("div");
-  row.className = "author-row";
-
-  row.innerHTML = 
-    <input type="text" placeholder="Author Name" class="author-name" value="${name}">
-    <input type="text" placeholder="LinkedIn URL" class="author-link" value="${link}">
-    <button type="button" onclick="this.parentElement.remove()">Remove</button>
-  ;
-
-  authorsDiv.appendChild(row);
-}
-
-/* ==== PREVIEW ==== */
-document.getElementById("content").addEventListener("input", () => {
-  if (document.getElementById("showPreview").checked) {
-    document.getElementById("preview").innerText = document.getElementById("content").value;
-  }
-});
-
-document.getElementById("showPreview").addEventListener("change", togglePreview);
-
-function togglePreview() {
-  const preview = document.getElementById("preview");
-  const show = document.getElementById("showPreview").checked;
-  if (show) {
-    preview.style.display = "block";
-    preview.innerText = document.getElementById("content").value;
-  } else {
-    preview.style.display = "none";
-  }
-}
-/* ==== PUBLISH ==== */
-function publish() {
-  const title = document.getElementById("title").value.trim();
-  const date = document.getElementById("date").value;
-  const category = document.getElementById("category").value.trim();
-  const excerpt = document.getElementById("excerpt").value.trim();
-  const image = document.getElementById("image").value.trim();
-  const imageAlt = document.getElementById("imageAlt").value.trim();
-  const content = document.getElementById("content").value;
-
-  if (!title  !date  !content) {
-    alert("Title, date, and content are required");
-    return;
+      .then(r => r.json())
+      .then(d => {
+        if (d.ok) {
+          document.getElementById("loginBox").style.display = "none";
+          document.getElementById("editor").style.display = "block";
+          document.getElementById("heading").innerText = "Admin Panel";
+          addAuthor(); // add initial author row
+        } else {
+          document.getElementById("loginMsg").innerText = "Invalid credentials";
+        }
+      })
+      .catch(err => {
+        document.getElementById("loginMsg").innerText = "Login error";
+        console.error(err);
+      });
   }
 
-  const authors = Array.from(document.querySelectorAll(".author-row")).map(row => ({
-    name: row.querySelector(".author-name").value.trim(),
-    link: row.querySelector(".author-link").value.trim()
-  }));
+  // ==== HELPERS ====
+  function slugify(text) {
+    return text.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+  }
 
-  const slug = slugify(title);
-  const filename = ${date}-${slug}.md;
+  // ==== AUTHORS DYNAMIC FIELDS ====
+  window.addAuthor = function(name = "", link = "") {
+    const authorsDiv = document.getElementById("authors");
+    const row = document.createElement("div");
+    row.className = "author-row";
 
-  const frontMatter = ---
+    const nameInput = document.createElement("input");
+    nameInput.type = "text";
+    nameInput.placeholder = "Author Name";
+    nameInput.className = "author-name";
+    nameInput.value = name;
+
+    const linkInput = document.createElement("input");
+    linkInput.type = "text";
+    linkInput.placeholder = "LinkedIn URL";
+    linkInput.className = "author-link";
+    linkInput.value = link;
+
+    const removeBtn = document.createElement("button");
+    removeBtn.type = "button";
+    removeBtn.innerText = "Remove";
+    removeBtn.addEventListener("click", () => row.remove());
+
+    row.appendChild(nameInput);
+    row.appendChild(linkInput);
+    row.appendChild(removeBtn);
+    authorsDiv.appendChild(row);
+  };
+
+  // ==== PREVIEW ====
+  function updatePreview() {
+    const preview = document.getElementById("preview");
+    if (showPreviewCheckbox.checked) {
+      preview.style.display = "block";
+      preview.innerText = contentInput.value;
+    } else {
+      preview.style.display = "none";
+    }
+  }
+
+  contentInput.addEventListener("input", updatePreview);
+  showPreviewCheckbox.addEventListener("change", updatePreview);
+
+  window.togglePreview = updatePreview;
+
+  // ==== PUBLISH ====
+  window.publish = function() {
+    const title = document.getElementById("title").value.trim();
+    const date = document.getElementById("date").value;
+    const category = document.getElementById("category").value.trim();
+    const excerpt = document.getElementById("excerpt").value.trim();
+    const image = document.getElementById("image").value.trim();
+    const imageAlt = document.getElementById("imageAlt").value.trim();
+    const content = contentInput.value;
+
+    if (!title || !date || !content) {
+      alert("Title, date, and content are required");
+      return;
+    }
+
+    const authors = Array.from(document.querySelectorAll(".author-row")).map(row => ({
+      name: row.querySelector(".author-name").value.trim(),
+      link: row.querySelector(".author-link").value.trim()
+    }));
+
+    const slug = slugify(title);
+    const filename = `${date}-${slug}.md`;
+
+    const frontMatter = `---
 layout: post
 title: "${title}"
 date: ${date}
@@ -167,30 +187,33 @@ excerpt: "${excerpt}"
 featured_image: "${image}"
 featured_image_alt: "${imageAlt}"
 ---
-${content};
+${content}`;
 
-  const progress = document.getElementById("progress");
-  const status = document.getElementById("status");
+    const progress = document.getElementById("progress");
+    const status = document.getElementById("status");
+    progress.value = 40;
+    status.innerText = "Publishing…";
 
-  progress.value = 40;
-  status.innerText = "Publishing…";
-
-  fetch("/.netlify/functions/github-post", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ filename, content: frontMatter })
-  })
-    .then(r => r.json())
-    .then(d => {
-      progress.value = 100;
-      status.innerText = d.ok ? "✅ Published successfully" : "❌ Publish failed";
-      setTimeout(() => { progress.value = 0; status.innerText = ""; }, 4000);
+    fetch("/.netlify/functions/github-post", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ filename, content: frontMatter })
     })
-    .catch(err => {
-      status.innerText = "❌ Network error";
-      console.error(err);
-    });
-}
+      .then(r => r.json())
+      .then(d => {
+        progress.value = 100;
+        status.innerText = d.ok ? "✅ Published successfully" : "❌ Publish failed";
+        setTimeout(() => {
+          progress.value = 0;
+          status.innerText = "";
+        }, 4000);
+      })
+      .catch(err => {
+        status.innerText = "❌ Network error";
+        console.error(err);
+      });
+  };
+});
 </script>
 
 <style>
