@@ -69,12 +69,17 @@
 
     /* MOBILE FIX */
 @media (max-width: 768px) {
-  /* Reduce horizontal padding on mobile */
+
+  /* ===== Base mobile padding ===== */
   body {
     padding: 0 12px;
   }
 
-  /* Header layout fix */
+  /* ===== Header fixes ===== */
+  header {
+    padding-bottom: 10px; /* prevents header from cramming into content */
+  }
+
   header > div {
     grid-template-columns: 60px 1fr 60px;
     padding: 0 12px;
@@ -93,30 +98,40 @@
     opacity: 0.8;
   }
 
-  /* Ensure main content stays centered */
+  /* ===== Main spacing (CRITICAL for search bar gap) ===== */
   main {
-    margin: 0 auto;
+    margin: 8px auto 0 auto; /* pulls content up, fixes search bar top/bottom imbalance */
   }
 
-  /* Center post list and cards on mobile */
+  /* ===== Search bar spacing ===== */
+  .search-container {
+    margin-bottom: 20px; /* keeps search close to Latest News */
+  }
+
+  .search-bar {
+    margin-top: 6px;
+    margin-bottom: 0;
+  }
+
+  /* ===== Post list centering ===== */
   .post-list {
-    margin: 0 auto;       /* center the UL */
-    padding: 0;           /* remove any extra padding */
+    margin: 0 auto;
+    padding: 0;
   }
 
+  /* ===== Card layout ===== */
   .post-card {
     margin-left: auto;
-    margin-right: auto;   /* center each card */
-    width: 100%;          /* full width of parent */
-    max-width: 400px;     /* optional: constrain max width */
+    margin-right: auto;
+    width: 100%;
+    max-width: 400px;
   }
 
-  /* Make card links stack vertically */
   .card-link {
     flex-direction: column;
   }
 
-  /* Adjust thumbnail width */
+  /* ===== Thumbnail sizing ===== */
   .thumb {
     width: 100%;
     height: 180px;
