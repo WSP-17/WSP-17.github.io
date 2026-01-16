@@ -9,9 +9,9 @@ title: Admin
   <!-- LOGIN -->
   <div id="loginBox">
     <input id="user" placeholder="Username"><br><br>
-    <input id="pass" type="password" placeholder="Password" type="password"><br><br>
+    <input id="pass" type="password" placeholder="Password"><br><br>
     <button onclick="login()">Login</button>
-    <p id="loginMsg"></p>
+    <p id="loginMsg" style="color:red;"></p>
   </div>
 
   <!-- EDITOR -->
@@ -48,7 +48,7 @@ title: Admin
     </label><br><br>
 
     <label>
-      <input type="checkbox" id="showPreview" onchange="togglePreview()"> Show Preview
+      <input type="checkbox" id="showPreview"> Show Preview
     </label><br><br>
 
     <div id="preview" class="hidden" style="border:1px solid #ccc;padding:10px;margin:10px 0;white-space:pre-wrap;"></div>
@@ -65,10 +65,15 @@ title: Admin
 <script>
 /* ==== LOGIN ==== */
 function login() {
-  const user = document.getElementById("user").value;
-  const pass = document.getElementById("pass").value;
+  const user = document.getElementById("user").value.trim();
+  const pass = document.getElementById("pass").value.trim();
 
-  fetch("/.netlify/functions/auth", {  // Correct function endpoint
+  if (!user || !pass) {
+    document.getElementById("loginMsg").innerText = "Enter username and password";
+    return;
+  }
+
+  fetch("/.netlify/functions/auth", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ user, pass })
@@ -79,6 +84,7 @@ function login() {
         document.getElementById("loginBox").style.display = "none";
         document.getElementById("editor").style.display = "block";
         document.getElementById("heading").innerText = "Admin Panel";
+        addAuthor(); // add initial author row
       } else {
         document.getElementById("loginMsg").innerText = "Invalid credentials";
       }
@@ -91,49 +97,33 @@ function login() {
 
 /* ==== HELPERS ==== */
 function slugify(text) {
-  return text
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/(^-|-$)/g, "");
+  return text.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
 }
 
-/* ==== PUBLISH ==== */
-function publish() {
-  const title = document.getElementById("title").value;
-  const date = document.getElementById("date").value;
-  const category = document.getElementById("category").value;
-  const excerpt = document.getElementById("excerpt").value;
-  const image = document.getElementById("image").value;
-  const imageAlt = document.getElementById("imageAlt").value;
-  const content = document.getElementById("content").value;
+/* ==== AUTHORS DYNAMIC FIELDS ==== */
+function addAuthor(name="", link="") {
+  const authorsDiv = document.getElementById("authors");
+  const row = document.createElement("div");
+  row.className = "author-row";
 
-  const slug = slugify(title);
-  const filename = ${date}-${slug}.md;
+  row.innerHTML = 
+    <input type="text" placeholder="Author Name" class="author-name" value="${name}">
+    <input type="text" placeholder="LinkedIn URL" class="author-link" value="${link}">
+    <button type="button" onclick="this.parentElement.remove()">Remove</button>
+  ;
 
-  document.getElementById("progress").value = 40;
-  document.getElementById("status").innerText = "Publishing…";
-
-  fetch("/.netlify/functions/github-post", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      filename,
-      content
-    })
-  })
-    .then(r => r.json())
-    .then(d => {
-      document.getElementById("progress").value = 100;
-      document.getElementById("status").innerText =
-        d.ok ? "✅ Published successfully" : "❌ Publish failed";
-    })
-    .catch(err => {
-      document.getElementById("status").innerText = "❌ Network error";
-      console.error(err);
-    });
+  authorsDiv.appendChild(row);
 }
 
-/* ==== PREVIEW TOGGLE ==== */
+/* ==== PREVIEW ==== */
+document.getElementById("content").addEventListener("input", () => {
+  if (document.getElementById("showPreview").checked) {
+    document.getElementById("preview").innerText = document.getElementById("content").value;
+  }
+});
+
+document.getElementById("showPreview").addEventListener("change", togglePreview);
+
 function togglePreview() {
   const preview = document.getElementById("preview");
   const show = document.getElementById("showPreview").checked;
@@ -144,7 +134,65 @@ function togglePreview() {
     preview.style.display = "none";
   }
 }
+/* ==== PUBLISH ==== */
+function publish() {
+  const title = document.getElementById("title").value.trim();
+  const date = document.getElementById("date").value;
+  const category = document.getElementById("category").value.trim();
+  const excerpt = document.getElementById("excerpt").value.trim();
+  const image = document.getElementById("image").value.trim();
+  const imageAlt = document.getElementById("imageAlt").value.trim();
+  const content = document.getElementById("content").value;
+
+  if (!title  !date  !content) {
+    alert("Title, date, and content are required");
+    return;
+  }
+
+  const authors = Array.from(document.querySelectorAll(".author-row")).map(row => ({
+    name: row.querySelector(".author-name").value.trim(),
+    link: row.querySelector(".author-link").value.trim()
+  }));
+
+  const slug = slugify(title);
+  const filename = ${date}-${slug}.md;
+
+  const frontMatter = ---
+layout: post
+title: "${title}"
+date: ${date}
+category: ${category}
+authors: ${JSON.stringify(authors)}
+excerpt: "${excerpt}"
+featured_image: "${image}"
+featured_image_alt: "${imageAlt}"
+---
+${content};
+
+  const progress = document.getElementById("progress");
+  const status = document.getElementById("status");
+
+  progress.value = 40;
+  status.innerText = "Publishing…";
+
+  fetch("/.netlify/functions/github-post", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ filename, content: frontMatter })
+  })
+    .then(r => r.json())
+    .then(d => {
+      progress.value = 100;
+      status.innerText = d.ok ? "✅ Published successfully" : "❌ Publish failed";
+      setTimeout(() => { progress.value = 0; status.innerText = ""; }, 4000);
+    })
+    .catch(err => {
+      status.innerText = "❌ Network error";
+      console.error(err);
+    });
+}
 </script>
+
 <style>
 .hidden { display:none; }
 .author-row { margin-bottom:5px; }
