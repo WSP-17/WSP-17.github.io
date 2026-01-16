@@ -1,50 +1,117 @@
-const { Octokit } = require("@octokit/rest");
+import fetch from "node-fetch";
 
-exports.handler = async function(event, context) {
+// Helper to slugify title for filename
+function slugify(text) {
+  return text
+    .toString()
+    .toLowerCase()
+    .replace(/\s+/g, "-")           // Replace spaces with -
+    .replace(/[^\w\-]+/g, "")       // Remove all non-word chars
+    .replace(/\-\-+/g, "-")         // Replace multiple - with single -
+    .replace(/^-+/, "")             // Trim - from start
+    .replace(/-+$/, "");            // Trim - from end
+}
+
+// Create markdown front matter
+function generateMarkdown(data) {
+  const {
+    title,
+    date,
+    category,
+    authors,
+    excerpt,
+    featured_image,
+    featured_image_alt,
+    content
+  } = data;
+
+  const authorsYaml = authors
+    ? authors.map(a =>   - name: "${a.name}"\n    link: "${a.link}").join("\n")
+    : "";
+
+  return ---
+layout: post
+title: "${title}"
+date: ${date}
+category: ${category}
+authors:
+${authorsYaml}
+excerpt: "${excerpt || ""}"
+featured_image: "${featured_image || ""}"
+featured_image_alt: "${featured_image_alt || ""}"
+---
+${content}
+;
+}
+
+export async function handler(event, context) {
   if (event.httpMethod !== "POST") {
     return { statusCode: 405, body: "Method Not Allowed" };
   }
 
-  try {
-    const { filename, content } = JSON.parse(event.body);
+  // Basic auth
+  const { username, password, post } = JSON.parse(event.body);
+  if (
+    username !== process.env.ADMIN_USER ||
+    password !== process.env.ADMIN_PASS
+  ) {
+    return { statusCode: 401, body: "Unauthorized" };
+  }
 
-    // ⚠️ IMPORTANT: add your GitHub Personal Access Token in Netlify Environment Variables
-    const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
-    if (!GITHUB_TOKEN) {
-      return { statusCode: 500, body: JSON.stringify({ message: "GitHub token not set" }) };
-    }
+  // Repo info
+  const owner = process.env.GITHUB_REPO_OWNER;
+  const repo = process.env.GITHUB_REPO_NAME;
+  const branch = process.env.GITHUB_BRANCH || "main";
+  const token = process.env.GITHUB_TOKEN;
 
-    const octokit = new Octokit({ auth: GITHUB_TOKEN });
+  // Generate filename: YYYY-MM-DD-slug.md
+  const dateObj = new Date(post.date);
+  const yyyy = dateObj.getFullYear();
+  const mm = String(dateObj.getMonth() + 1).padStart(2, "0");
+  const dd = String(dateObj.getDate()).padStart(2, "0");
+  const slug = slugify(post.title);
+  const filename = _posts/${yyyy}-${mm}-${dd}-${slug}.md;
 
-    const owner = "WSP-17";          // your GitHub username or org
-    const repo = "WSP-17.github.io"; // your repo name
-    const path = _posts/${filename};
+  const content = generateMarkdown(post);
 
-    // 1. Check if the file exists
-    let sha;
-    try {
-      const existing = await octokit.repos.getContent({ owner, repo, path });
-      sha = existing.data.sha;
-    } catch (e) {
-      // file doesn't exist, so we will create a new one
-    }
+  // Check if file exists first (GitHub API)
+  const getUrl = https://api.github.com/repos/${owner}/${repo}/contents/${filename}?ref=${branch};
+  const getRes = await fetch(getUrl, {
+    headers: { Authorization: token ${token} },
+  });
+  let sha = null;
+  if (getRes.status === 200) {
+    const data = await getRes.json();
+    sha = data.sha; // needed for updating existing file
+  }
 
-    // 2. Create or update the file
-    const response = await octokit.repos.createOrUpdateFileContents({
-      owner,
-      repo,
-      path,
-      message: sha ? Update post ${filename} : Create post ${filename},
-      content: Buffer.from(content).toString("base64"),
-      sha
-    });
+  const url = https://api.github.com/repos/${owner}/${repo}/contents/${filename};
+  const payload = {
+    message: sha ? Update post: ${post.title} : Add new post: ${post.title},
+    content: Buffer.from(content).toString("base64"),
+    branch,
+  };
+  if (sha) payload.sha = sha;
 
+  const res = await fetch(url, {
+    method: "PUT",
+    headers: {
+      Authorization: token ${token},
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(payload),
+  });
+
+  const result = await res.json();
+  if (res.status >= 200 && res.status < 300) {
     return {
       statusCode: 200,
-      body: JSON.stringify({ message: "Post saved successfully!", url: response.data.content.html_url })
+      body: JSON.stringify({ message: "Post saved successfully!", result }),
     };
-  } catch (err) {
-    console.error(err);
-    return { statusCode: 500, body: JSON.stringify({ message: "Error saving post" }) };
+  } else {
+    return {
+      statusCode: res.status,
+      body: JSON.stringify({ message: "Failed to save post", result }),
+    };
   }
-};
+}
