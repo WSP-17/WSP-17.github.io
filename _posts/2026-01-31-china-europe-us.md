@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "US–China and European Trade Dynamics"
+title: "China – Refuge for U.S. Allies?"
 date: 2026-01-31
 category: foreign-trade
 authors:
