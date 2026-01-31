@@ -7,18 +7,18 @@ authors:
   - name: "Divyansh Sharma"
     link: "https://www.linkedin.com/in/divyansh-sharma-h17/"
 excerpt: "European nations recalibrate trade relations with China amid shifting US alliances and geopolitical pressure."
-featured_image: "assets/images/posts/china-europe-us/carney-jinping.jpeg"
+featured_image: assets/images/posts/china-europe-us/carney-jinping.jpeg
 featured_image_alt: "Canadian Prime Minister Mark Carney with Chinese President Xi Jinping"
 ---
 
-A few weeks ago, Canadian Prime Minister **Mark Carney** reached an understanding with **Xi Jinping** to slash tariffs on electric vehicle imports from China into Canada, in exchange for full tariff exemptions on Canadian agricultural exports. **U.K. Prime Minister Keir Starmer** arrived in Beijing this week to mend relations with China. **German Chancellor Friedrich Merz** and **Finnish Prime Minister Petteri Orpo** are among other European leaders seeking companionship with Beijing.
+A few weeks ago, Canadian Prime Minister **Mark Carney** reached an understanding with **Xi Jinping**, to slash tariffs on electric vehicle imports from China into Canada, in exchange for full tariff exemptions on Canadian agricultural exports. **U.K. Prime Minister Keir Starmer** arrived in Beijing this week, to mend relations with China. **German Chancellor Friedrich Merz** and **Finnish Prime Minister Petteri Orpo** are among other European leaders seeking companionship with Beijing.
 
 A question arises. What is going on? Why is Washington losing its allies to its arch rival?
 
 The answer lies far beyond trade. Washington’s push towards asserting control of Greenland, and its subsequent pressuring of European allies to further this end, has become the igniter of such measures. European nations have opposed U.S. control of Greenland, amid persistent fears that retribution for this may present itself as tariffs.
 
 <figure>
-  <img src="{{ 'assets/images/posts/china-europe-us/china-europe.JPG' | relative_url }}" alt="European leaders engaging with China amid shifting trade relations">
+  <img src="/assets/images/posts/china-europe-us/china-europe.JPG" alt="European leaders engaging with China amid shifting trade relations">
   <figcaption>European leaders increasingly engage Beijing as transatlantic trade relations fray.</figcaption>
 </figure>
 
